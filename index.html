@@ -3050,7 +3050,7 @@ let userProfile = null;
 let chatHistory = [];
 let currentPage = 'home';
 let todayTasks  = [];
-let isUnlocked  = sessionStorage.getItem('moneyos_unlocked') === 'true';
+let isUnlocked  = localStorage.getItem('moneyos_unlocked') === 'true';
 
 const darkPages = new Set(['coach', 'coach-onboard']);
 
@@ -3097,7 +3097,7 @@ function restoreCoachUI(profile, tasks, unlocked) {
   isUnlocked  = unlocked;
 
   // Restore paywall unlock
-  if (isUnlocked) sessionStorage.setItem('moneyos_unlocked', 'true');
+  if (isUnlocked) localStorage.setItem('moneyos_unlocked', 'true');
 
   // Update home greeting
   document.getElementById('greet-txt').innerHTML =
@@ -3705,15 +3705,15 @@ function showPaymentInstructions() {
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Ngân hàng</span>
-              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">Vietcombank</span>
+              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">ACB</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Số tài khoản</span>
-              <span style="font-size:13px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;" onclick="copyText('1234567890',this)">1234 5678 90 ✦</span>
+              <span style="font-size:13px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;" onclick="copyText('258413829',this)">258413829 ✦</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Tên</span>
-              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">NGUYEN VAN A</span>
+              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">LE THANH VI</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Số tiền</span>
@@ -3761,7 +3761,7 @@ function dismissPaymentScreen() {
 
 function confirmPayment() {
   isUnlocked = true;
-  sessionStorage.setItem('moneyos_unlocked', 'true');
+  localStorage.setItem('moneyos_unlocked', 'true');
   document.getElementById('paywall-overlay').classList.remove('show');
   document.getElementById('fw-paywall-overlay').classList.remove('show');
   document.body.style.overflow = '';
@@ -3958,14 +3958,14 @@ function devUnlockTap() {
     if (isUnlocked) {
       // Toggle off
       isUnlocked = false;
-      sessionStorage.removeItem('moneyos_unlocked');
+      localStorage.removeItem('moneyos_unlocked');
       clearState();
       showToast('🔒 Dev: Locked');
       applyCoachLockState();
       if (userProfile) { renderOpportunities(getFallbackOpps()); }
     } else {
       isUnlocked = true;
-      sessionStorage.setItem('moneyos_unlocked', 'true');
+      localStorage.setItem('moneyos_unlocked', 'true');
       saveState();
       showToast('🔓 Dev: Unlocked — Pro mode ON');
       applyCoachLockState();

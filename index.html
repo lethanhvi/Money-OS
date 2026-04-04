@@ -3225,14 +3225,9 @@ async function aiPost(body) {
   if (!key) {
     throw new Error('NO_KEY');
   }
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   if (!res.ok) {
@@ -3888,13 +3883,9 @@ Quan trọng: không chung chung, không lặp ý, không dài dòng. Viết nh�
   showTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -4627,13 +4618,9 @@ Hồ sơ user: Tên: ${userProfile.name}, Nghề: ${userProfile.job}, Kỹ năng
 Trả lời bằng tiếng Việt. Ngắn gọn 3–4 câu. Cụ thể, thực tế, có thể làm ngay. Đề xuất số tiền VNĐ cụ thể và 1 hành động rõ ràng.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 400,
@@ -4665,9 +4652,16 @@ Trả lời bằng tiếng Việt. Ngắn gọn 3–4 câu. Cụ thể, thực t
 
   } catch(e) {
     removeTyping();
-    // Fallback rule-based nếu API fail
     freeReplyCount++;
-    const reply = getRuleBasedReply(text);
+
+    // Fallback: trả lời dựa vào turn count để không lặp
+    const fallbackReplies = [
+      getRuleBasedReply(text),
+      `Câu hỏi hay! Với ${userProfile?.skills?.[0] || 'kỹ năng của bạn'}, bước tiếp theo cụ thể nhất là: chọn 1 platform (Upwork/Fiverr/Facebook), tạo profile trong 30 phút hôm nay, và gửi 3 đề xuất đầu tiên trước cuối tuần.`,
+      `Dựa trên hồ sơ của bạn: ưu tiên bắt đầu với dự án nhỏ (500k–2 triệu) để lấy kinh nghiệm thực tế. Đừng chờ "sẵn sàng 100%" — bắt đầu ngay với những gì bạn đang có.`,
+      `Để tránh mất thời gian: tập trung vào 1 kênh duy nhất trong 2 tuần đầu. Đừng thử nhiều thứ cùng lúc. Chọn kênh phù hợp nhất với ${userProfile?.time || 'thời gian'} rảnh của bạn.`
+    ];
+    const reply = fallbackReplies[Math.min(freeReplyCount - 1, fallbackReplies.length - 1)];
     appendMsg('ai', reply);
     chatHistory.push({ role:'assistant', content:reply });
     btn.disabled = false;

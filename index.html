@@ -3951,6 +3951,11 @@ function devUnlockTap() {
       applyCoachLockState();
       hideChatLimitWall();
       if (userProfile) { renderOpportunities(getFallbackOpps()); }
+      // Show intake form như paid user thật
+      setTimeout(() => {
+        document.getElementById('intake-overlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }, 400);
     }
   }
 }

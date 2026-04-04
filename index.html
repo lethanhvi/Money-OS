@@ -3914,19 +3914,21 @@ Quan trọng: không chung chung, không lặp ý, không dài dòng. Viết nh�
 
   } catch(e) {
     removeTyping();
-    appendMsg('ai', `Không thể tạo plan lúc này. Hãy thử lại hoặc hỏi tôi trực tiếp!`);
+    const msg = e.message?.includes('API Key')
+      ? e.message
+      : `Không kết nối được AI lúc này (${e.message}). Bạn có thể hỏi tôi trực tiếp trong chat bên dưới!`;
+    appendMsg('ai', msg);
   }
 }
 
 // ── Universal AI caller — tự detect môi trường ──
 async function callAI(body) {
-  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
-  const isLocal  = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
+  const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost';
 
-  if (isLocal || !isVercel) {
-    // Local / không có server → gọi Anthropic trực tiếp, cần API key
+  if (isLocal) {
+    // Local → gọi Anthropic trực tiếp, cần API key
     const key = getApiKey();
-    if (!key) throw new Error('Cần nhập API Key để dùng tính năng này (nhấn 🔑 góc trên)');
+    if (!key) throw new Error('Cần nhập API Key (nhấn 🔑 góc trên)');
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -3937,12 +3939,22 @@ async function callAI(body) {
       },
       body: JSON.stringify(body)
     });
-    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e?.error?.message || `HTTP ${res.status}`);
+    }
     return res.json();
   } else {
-    // Vercel → proxy an toàn
-    const data = await callAI(body);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // Vercel / hosted → proxy
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e?.error || `HTTP ${res.status}`);
+    }
     return res.json();
   }
 }

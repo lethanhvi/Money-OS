@@ -3737,15 +3737,33 @@ function showPaymentInstructions() {
         <!-- Tip -->
         <div style="background:var(--green-dim);border:1px solid rgba(0,176,116,0.2);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;">
           <span style="flex-shrink:0;font-size:16px;">✅</span>
-          <span style="font-size:12px;color:var(--green);font-family:'DM Mono',monospace;line-height:1.6;">Nhấn vào số TK hoặc nội dung để copy. Sau khi chuyển khoản → nhấn nút bên dưới.</span>
+          <span style="font-size:12px;color:var(--green);font-family:'DM Mono',monospace;line-height:1.6;">Nhấn vào số TK hoặc nội dung để copy. Sau khi chuyển khoản, bạn sẽ nhận mã kích hoạt qua Zalo trong vòng 15 phút.</span>
         </div>
 
-        <!-- CTA -->
-        <button class="pw-cta" onclick="confirmPayment()" type="button" style="margin-bottom:10px;">
-          ✅ Đã chuyển khoản — Mở khóa ngay
-        </button>
+        <!-- Step 2: Enter activation code -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">MÃ KÍCH HOẠT</div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="activation-code-input"
+              placeholder="Nhập mã 6 ký tự..."
+              maxlength="8"
+              style="flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Mono',monospace;font-size:16px;letter-spacing:3px;text-transform:uppercase;outline:none;color:var(--text);background:var(--surface2);"
+              oninput="this.value=this.value.toUpperCase()"
+            >
+            <button class="pw-cta" onclick="verifyActivationCode()" type="button"
+              style="width:auto;padding:12px 18px;font-size:14px;margin-bottom:0;flex-shrink:0;">
+              →
+            </button>
+          </div>
+          <div id="code-error" style="display:none;margin-top:6px;font-size:11px;color:var(--red);font-family:'DM Mono',monospace;">
+            ❌ Mã không đúng. Kiểm tra lại hoặc liên hệ hỗ trợ.
+          </div>
+        </div>
 
-        <div style="text-align:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;padding-bottom:8px;">
+        <!-- Contact support -->
+        <div style="text-align:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.8;padding-bottom:8px;">
+          Chưa nhận mã? Nhắn <strong style="color:var(--blue);">MONEYOS PRO</strong> + ảnh chụp màn hình CK<br>
+          qua Zalo: <strong style="color:var(--blue);">0xxx xxx xxx</strong><br>
           🛡️ Hoàn tiền nếu không thấy giá trị trong 3 ngày
         </div>
       </div>
@@ -3768,6 +3786,59 @@ function dismissPaymentScreen() {
   // Restore original paywall HTML next time
   paywallShown = false;
   location.reload(); // simple reset for MVP
+}
+
+// ── ACTIVATION CODE SYSTEM ──────────────────────
+// Mỗi mã dùng 1 lần — thêm mã mới khi có user trả tiền
+// Định dạng: hash SHA-256 của mã thật (không lưu mã thật trong code)
+// Để tạo hash: https://emn178.github.io/online-tools/sha256.html
+
+const VALID_CODE_HASHES = [
+  // Thêm hash SHA-256 của các mã bạn tạo vào đây
+  // Ví dụ: mã "MOS001" → hash tương ứng
+  // Hướng dẫn: tạo mã ngẫu nhiên 6-8 ký tự → hash → paste hash vào đây
+];
+
+// Mã master cho dev/test (hash của "DEVTEST")
+const DEV_HASH = 'a4e8e1f7e8c9d0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5';
+
+async function hashCode(code) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code.toUpperCase().trim()));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function verifyActivationCode() {
+  const input = document.getElementById('activation-code-input');
+  const code = input?.value?.trim().toUpperCase();
+  const errEl = document.getElementById('code-error');
+
+  if (!code || code.length < 4) {
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '⚠️ Nhập mã kích hoạt của bạn.'; }
+    return;
+  }
+
+  const hash = await hashCode(code);
+
+  // Check used codes
+  const usedCodes = JSON.parse(localStorage.getItem('moneyos_used_codes') || '[]');
+  if (usedCodes.includes(hash)) {
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã này đã được sử dụng rồi.'; }
+    return;
+  }
+
+  // Validate
+  const isValid = VALID_CODE_HASHES.includes(hash);
+
+  if (isValid) {
+    // Mark code as used
+    usedCodes.push(hash);
+    localStorage.setItem('moneyos_used_codes', JSON.stringify(usedCodes));
+    confirmPayment();
+  } else {
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã không đúng. Kiểm tra lại hoặc nhắn Zalo để được hỗ trợ.'; }
+    input.style.borderColor = 'var(--red)';
+    setTimeout(() => { if (input) input.style.borderColor = ''; }, 2000);
+  }
 }
 
 function confirmPayment() {
@@ -3972,14 +4043,28 @@ async function callAI(body) {
 
 // ── DEV: secret unlock (nhấn logo 5 lần) ──
 let _devTaps = 0, _devTimer;
-function devUnlockTap() {
+async function devUnlockTap() {
   _devTaps++;
   clearTimeout(_devTimer);
   _devTimer = setTimeout(() => { _devTaps = 0; }, 2000);
-  if (_devTaps >= 5) {
+
+  if (_devTaps === 7) {
+    // 7 lần → tạo mã kích hoạt mới để gửi cho user
+    _devTaps = 0;
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    const hash = await hashCode(code);
+    // Hiện mã + hash để paste vào VALID_CODE_HASHES
+    const msg = `MÃ MỚI: ${code}\n\nHash (paste vào VALID_CODE_HASHES):\n"${hash}"`;
+    alert(msg);
+    navigator.clipboard?.writeText(hash).catch(()=>{});
+    return;
+  }
+
+  if (_devTaps === 5) {
     _devTaps = 0;
     if (isUnlocked) {
-      // Toggle off
       isUnlocked = false;
       localStorage.removeItem('moneyos_unlocked');
       clearState();
@@ -3994,7 +4079,6 @@ function devUnlockTap() {
       applyCoachLockState();
       hideChatLimitWall();
       if (userProfile) { renderOpportunities(getFallbackOpps()); }
-      // Show intake form như paid user thật
       setTimeout(() => {
         document.getElementById('intake-overlay').classList.add('show');
         document.body.style.overflow = 'hidden';

@@ -4572,7 +4572,7 @@ function detectIntent(text) {
   const t = text.toLowerCase();
 
   // Câu hỏi định nghĩa — "X là gì"
-  if (t.includes('là gì') || t.includes('nghĩa là') || t.includes('giải thích') || t.includes('what is') || t.includes('định nghĩa')) return 'definition';
+  if (t.includes('là gì') || t.includes('nghĩa là') || t.includes('giải thích') || t.includes('what is') || t.includes('định nghĩa') || t.includes('cho tôi biết về')) return 'definition';
 
   // Platform / freelance
   if (t.includes('upwork') || t.includes('fiverr') || t.includes('platform') || t.includes('freelance')) return 'upwork';
@@ -4665,21 +4665,26 @@ function getRuleBasedReply(text) {
 
   // Câu hỏi định nghĩa — trả lời đúng câu hỏi
   if (intent === 'definition') {
-    // Extract từ khóa được hỏi
-    const keyword = text.replace(/là gì|nghĩa là gì|\?/gi, '').trim();
+    const kw = text.toLowerCase().replace(/là gì|nghĩa là gì|cho tôi biết về|\?/gi, '').trim();
     const defs = {
-      'sme': 'SME = Small & Medium Enterprise — doanh nghiệp vừa và nhỏ (dưới 300 nhân viên). Đây là thị trường lớn nhất để freelance vì SME cần dịch vụ nhưng không muốn thuê full-time.',
-      'upwork': 'Upwork là platform freelance lớn nhất thế giới. Bạn tạo profile, bid job, làm việc remote với client nước ngoài. Rate tốt từ 15–50 USD/giờ tùy kỹ năng.',
-      'fiverr': 'Fiverr là platform freelance theo gig — bạn đăng dịch vụ cố định (VD: thiết kế logo 500k), client tìm và order. Phù hợp hơn Upwork nếu bạn muốn client tự tìm đến.',
-      'affiliate': 'Affiliate marketing = bạn chia sẻ link sản phẩm, ai mua qua link đó thì bạn nhận hoa hồng 3–15%. Không cần vốn, không cần kho hàng.',
-      'passive income': 'Thu nhập thụ động = tiền vào tự động mà không cần làm việc trực tiếp. VD: affiliate link, khóa học online, template bán lại. Mất công setup ban đầu nhưng sau đó chạy tự động.',
-      'dropship': 'Dropshipping = bán hàng không cần kho — bạn nhận đơn, nhà cung cấp giao hàng. Bạn hưởng chênh lệch giá. Phù hợp nếu có kỹ năng marketing.',
+      'landing page': 'Landing page là trang web 1 mục đích duy nhất — thường để bán hàng, thu thập email, hoặc quảng cáo dịch vụ. Ví dụ: bạn chạy quảng cáo Facebook → người click vào thấy trang giới thiệu dịch vụ → điền thông tin hoặc mua hàng. Làm landing page freelance kiếm 2–8 triệu/trang.',
+      'sme': 'SME = doanh nghiệp vừa và nhỏ (dưới 300 nhân viên). Đây là thị trường lớn nhất để freelance vì SME cần dịch vụ nhưng không muốn thuê full-time nhân viên.',
+      'upwork': 'Upwork là nền tảng freelance lớn nhất thế giới. Bạn tạo profile, đấu thầu job, làm việc remote với khách hàng quốc tế. Rate từ 15–50 USD/giờ tùy kỹ năng.',
+      'fiverr': 'Fiverr là nền tảng freelance theo gói dịch vụ cố định. Bạn đăng "tôi làm X với giá Y", khách hàng tự tìm và đặt. Phù hợp khi muốn khách tự đến thay vì mình phải đi tìm.',
+      'affiliate': 'Affiliate = tiếp thị liên kết. Bạn chia sẻ link sản phẩm, ai mua qua link đó bạn nhận hoa hồng 3–20%. Không cần vốn, không cần kho hàng.',
+      'dropship': 'Dropshipping = bán hàng không cần kho. Bạn nhận đơn từ khách, nhà cung cấp giao thẳng cho khách. Bạn hưởng chênh lệch giá.',
+      'passive income': 'Thu nhập thụ động = tiền vào tự động không cần làm trực tiếp. Ví dụ: khóa học online, template bán lại, affiliate link. Tốn công setup ban đầu nhưng sau đó chạy tự động.',
+      'personal brand': 'Personal brand = thương hiệu cá nhân. Xây dựng danh tiếng trong 1 lĩnh vực để khách hàng tự tìm đến bạn thay vì bạn phải đi tìm họ.',
+      'content creator': 'Content creator = người tạo nội dung (video, bài viết, podcast) để kiếm tiền qua quảng cáo, sponsorship, hoặc bán sản phẩm. Phù hợp nếu bạn thích chia sẻ kiến thức.',
+      'saas': 'SaaS = phần mềm dịch vụ trả phí hàng tháng. Ví dụ: bạn build 1 tool nhỏ giải quyết vấn đề cụ thể → charge 99k–500k/tháng/user → thu nhập thụ động.',
     };
-    const kw = keyword.toLowerCase();
+
     for (const [key, def] of Object.entries(defs)) {
       if (kw.includes(key)) return def;
     }
-    return `"${keyword}" là thuật ngữ trong lĩnh vực kiếm tiền online. Bạn có thể hỏi cụ thể hơn hoặc cho tôi biết bạn gặp từ này trong ngữ cảnh nào để tôi giải thích đúng hơn.`;
+
+    // Không có trong dictionary → trả lời dựa trên context
+    return `"${kw.trim()}" là thuật ngữ phổ biến trong kiếm tiền online. Hãy hỏi lại cụ thể hơn — ví dụ "landing page có thể kiếm tiền không?" hay "làm affiliate như thế nào?" — tôi sẽ trả lời chi tiết hơn.`;
   }
 
   if (intent === 'start') {
@@ -4722,9 +4727,15 @@ async function sendMessage() {
   btn.disabled = true;
   showTyping();
 
-  const sys = `Bạn là Income Coach của MoneyOS — ứng dụng giúp người Việt kiếm thêm thu nhập.
+  const sys = `Bạn là Income Coach của MoneyOS — chuyên giúp người Việt kiếm thêm thu nhập.
 Hồ sơ user: Tên: ${userProfile.name}, Nghề: ${userProfile.job}, Kỹ năng: ${userProfile.skills.join(', ')}, Thời gian rảnh: ${userProfile.time}/tuần, Mục tiêu: ${userProfile.goal}/tháng.
-Trả lời bằng tiếng Việt. Ngắn gọn 3–4 câu. Cụ thể, thực tế, có thể làm ngay. Đề xuất số tiền VNĐ cụ thể và 1 hành động rõ ràng.`;
+
+Quy tắc trả lời:
+- Trả lời ĐÚNG câu hỏi user hỏi, không lạc đề
+- Nếu user hỏi định nghĩa (X là gì) → giải thích rõ ràng bằng tiếng Việt đơn giản, có ví dụ thực tế
+- Nếu user hỏi cách làm → đưa bước cụ thể, có thể làm ngay trong 30 phút
+- Ngắn gọn 3–5 câu. Số tiền VNĐ cụ thể. Không nói vòng vo.
+- Luôn kết bằng 1 hành động cụ thể user có thể làm ngay hôm nay.`;
 
   try {
     const data = await callAI({

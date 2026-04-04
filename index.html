@@ -3894,6 +3894,7 @@ function confirmPayment() {
   }
   saveState();
   showToast('🎉 Đã mở khóa!');
+  trackReferralConversion(); // ghi nhận referral nếu có
 
   // Show intake form để collect thêm info → generate plan
   setTimeout(() => {
@@ -4030,6 +4031,9 @@ Quan trọng: không chung chung, không lặp ý, không dài dòng. Viết nh�
       steps.push({ title: `Day ${m[1]}`, desc: m[2].trim(), time: '20 phút', status: i === 0 ? 'doing' : 'todo' });
     });
     if (steps.length > 0) renderPlan(steps);
+
+    // Sau 3s → nhắc user share để kiếm hoa hồng
+    setTimeout(() => showReferralSharePrompt(), 3000);
 
   } catch(e) {
     removeTyping();
@@ -5109,8 +5113,101 @@ function renderStreams() {
 }
 
 // ══════════════════════════════════════
-//  TOAST
+//  REFERRAL SYSTEM
 // ══════════════════════════════════════
+
+// Đọc ?ref= từ URL và lưu lại
+function initReferral() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref')?.toUpperCase().trim();
+  if (ref) {
+    localStorage.setItem('moneyos_ref', ref);
+    // Hiện banner welcome cho người được giới thiệu
+    showReferralBanner(ref);
+  }
+}
+
+function showReferralBanner(ref) {
+  // Tạo banner nhỏ ở top
+  const banner = document.createElement('div');
+  banner.id = 'ref-banner';
+  banner.style.cssText = `
+    position:fixed; top:0; left:0; right:0; z-index:999;
+    background:linear-gradient(135deg,#1565C0,#0d47a1);
+    color:#fff; text-align:center; padding:10px 16px;
+    font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.3px;
+    animation: slideDown 0.4s ease;
+  `;
+  banner.innerHTML = `🎁 Bạn được <strong>${ref}</strong> giới thiệu — nhận ưu đãi đặc biệt!
+    <button onclick="document.getElementById('ref-banner').remove()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:16px;cursor:pointer;margin-left:8px;">×</button>`;
+  document.body.prepend(banner);
+  setTimeout(() => banner?.remove(), 5000);
+}
+
+// Lấy ref hiện tại (dùng khi confirm payment)
+function getCurrentRef() {
+  return localStorage.getItem('moneyos_ref') || null;
+}
+
+function showReferralSharePrompt() {
+  if (!isUnlocked || !userProfile) return;
+  const refLink = generateRefLink(userProfile.name);
+
+  const msg = document.createElement('div');
+  msg.className = 'msg ai';
+  msg.innerHTML = `<div class="msg-avatar">✦</div>
+  <div class="msg-bubble" style="background:linear-gradient(135deg,rgba(21,101,192,0.08),rgba(21,101,192,0.04));border:1px solid rgba(21,101,192,0.2);">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px;">💰 Kiếm thêm 30k/referral</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6;">Share link của bạn cho bạn bè. Mỗi người mua qua link → bạn nhận <strong>30.000đ</strong> từ mình.</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);word-break:break-all;margin-bottom:8px;">${refLink}</div>
+    <button onclick="copyRefLink('${refLink}',this)" type="button"
+      style="width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;touch-action:manipulation;">
+      📋 Copy link của tôi
+    </button>
+  </div>`;
+
+  const c = document.getElementById('chat-messages');
+  if (c) { c.appendChild(msg); c.scrollTop = c.scrollHeight; }
+}
+
+function copyRefLink(link, btn) {
+  navigator.clipboard?.writeText(link).catch(()=>{});
+  btn.textContent = '✓ Đã copy!';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => {
+    btn.textContent = '📋 Copy link của tôi';
+    btn.style.background = 'var(--blue)';
+  }, 2000);
+}
+
+// Ghi nhận conversion — gọi khi user unlock thành công
+function trackReferralConversion() {
+  const ref = getCurrentRef();
+  if (!ref) return;
+
+  // Lưu vào localStorage để bạn xem sau
+  const conversions = JSON.parse(localStorage.getItem('moneyos_ref_conversions') || '[]');
+  conversions.push({
+    ref,
+    time: new Date().toISOString(),
+    user: userProfile?.name || 'Unknown'
+  });
+  localStorage.setItem('moneyos_ref_conversions', JSON.stringify(conversions));
+
+  // Ghi vào console để debug
+  console.log(`✅ Referral conversion: ${ref} → ${userProfile?.name}`);
+}
+
+// Tạo link referral cho user (hiện trong app sau khi unlock)
+function generateRefLink(name) {
+  const slug = name.toUpperCase().replace(/\s+/g,'').slice(0, 10);
+  return `${window.location.origin}${window.location.pathname}?ref=${slug}`;
+}
+
+// Chạy khi load app
+initReferral();
+
+
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');

@@ -1706,33 +1706,50 @@ svg.spark { width:100%; height:54px; }
 .chat-lock-btn:active { opacity: 0.85; }
 
 .chat-limit-wall {
-  padding: 22px 20px 18px; text-align: center;
-  background: linear-gradient(135deg, rgba(21,101,192,0.07), rgba(21,101,192,0.03));
+  padding: 20px 16px 16px;
+  background: linear-gradient(135deg, #f7f9ff, #eef3ff);
   border-top: 2px solid rgba(21,101,192,0.2);
-  border-bottom: 1px solid rgba(21,101,192,0.1);
 }
-.chat-limit-icon { font-size: 26px; margin-bottom: 8px; }
-.chat-limit-title {
+
+/* Outcome row */
+.clw-outcome-row {
+  display: flex; align-items: center;
+  background: linear-gradient(135deg, #ddeeff, #e8f5ff);
+  border: 1px solid rgba(21,101,192,0.18);
+  border-radius: 12px; padding: 12px; margin-bottom: 14px;
+}
+.clw-outcome-item { flex: 1; text-align: center; }
+.clw-outcome-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; color: var(--blue); }
+.clw-outcome-lbl { font-size: 9px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.clw-outcome-div { width: 1px; height: 32px; background: rgba(21,101,192,0.15); flex-shrink: 0; }
+
+/* Title */
+.clw-title {
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 16px; color: var(--text); margin-bottom: 10px;
+  font-size: 17px; color: var(--text);
+  margin-bottom: 10px; line-height: 1.3;
 }
-.chat-limit-sub {
+
+/* Sub */
+.clw-sub {
   font-size: 12px; color: var(--text2);
   font-family: 'DM Mono', monospace; line-height: 1.9;
-  margin-bottom: 12px; text-align: left;
-  background: var(--surface2); border-radius: 8px;
-  padding: 10px 12px;
+  background: var(--surface2); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 12px;
 }
-.chat-limit-urgency {
-  font-size: 11px; color: var(--red);
-  font-family: 'DM Mono', monospace;
-  font-weight: 500; margin-bottom: 12px;
-  background: var(--red-dim); border: 1px solid rgba(240,58,95,0.15);
-  border-radius: 6px; padding: 7px 10px;
+
+/* Urgency */
+.clw-urgency {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--red-dim); border: 1px solid rgba(240,58,95,0.18);
+  border-radius: 8px; padding: 9px 12px; margin-bottom: 14px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--red);
 }
-.chat-limit-note {
-  font-size: 11px; color: var(--muted);
-  font-family: 'DM Mono', monospace; margin-top: 8px;
+.clw-urgency-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red); flex-shrink: 0;
+  box-shadow: 0 0 6px var(--red);
+  animation: pulse-dot 1.2s ease infinite;
 }
 
 /* Sticky nav — always visible on both paywalls */
@@ -1799,6 +1816,28 @@ svg.spark { width:100%; height:54px; }
   color: rgba(176,184,208,0.65);
 }
 .pw-home-btn-dark:active { background: rgba(255,255,255,0.15); color: rgba(176,184,208,0.95); }
+
+/* ── INTAKE FORM ──────────────────────────────── */
+.intake-field { margin-bottom: 18px; }
+.intake-label {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.intake-opts { display: flex; flex-wrap: wrap; gap: 7px; }
+.intake-opt {
+  padding: 8px 14px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 12px; color: var(--text2);
+  cursor: pointer; transition: all 0.15s;
+  font-family: 'DM Mono', monospace;
+  touch-action: manipulation;
+}
+.intake-opt.on {
+  background: var(--blue-dim); border-color: var(--blue);
+  color: var(--blue); font-weight: 500;
+}
+.intake-opt:active { transform: scale(0.96); }
 
 /* CONFIRM RESET MODAL */
 .confirm-overlay {
@@ -2176,7 +2215,7 @@ svg.spark { width:100%; height:54px; }
 <div class="app-wrapper">
 
   <div class="topbar" style="animation:slideDown 0.5s ease both;">
-    <div class="logo"><div class="logo-mark">$</div>Money<span style="color:var(--blue)">OS</span></div>
+    <div class="logo" onclick="devUnlockTap()"><div class="logo-mark">$</div>Money<span style="color:var(--blue)">OS</span></div>
     <div class="topbar-actions">
       <div class="icon-btn">🔔<div class="notif-dot"></div></div>
       <div class="avatar" id="home-avatar" onclick="userProfile ? confirmResetCoach() : navTo('coach')">TH</div>
@@ -2631,16 +2670,48 @@ Ai cần thì tham khảo nhé 👇</div>
 
     <!-- Free limit banner — ẩn mặc định, hiện sau 2 msg -->
     <div class="chat-limit-wall" id="chat-limit-wall" style="display:none">
-      <div class="chat-limit-icon">🔒</div>
-      <div class="chat-limit-title" id="chat-limit-title">Bạn đang rất gần 1–3 triệu/tháng</div>
-      <div class="chat-limit-sub">AI đã chuẩn bị sẵn cho bạn:<br>
+
+      <!-- Outcome numbers -->
+      <div class="clw-outcome-row">
+        <div class="clw-outcome-item">
+          <div class="clw-outcome-num" id="chat-limit-earn">3–6tr</div>
+          <div class="clw-outcome-lbl">có thể kiếm/tháng</div>
+        </div>
+        <div class="clw-outcome-div"></div>
+        <div class="clw-outcome-item">
+          <div class="clw-outcome-num">7 ngày</div>
+          <div class="clw-outcome-lbl">ra tiền đầu tiên</div>
+        </div>
+        <div class="clw-outcome-div"></div>
+        <div class="clw-outcome-item">
+          <div class="clw-outcome-num">0đ</div>
+          <div class="clw-outcome-lbl">vốn ban đầu</div>
+        </div>
+      </div>
+
+      <!-- Headline -->
+      <div class="clw-title" id="chat-limit-title">🔥 Bạn đang rất gần 1–3 triệu/tháng</div>
+
+      <!-- What AI prepared -->
+      <div class="clw-sub">
+        AI đã chuẩn bị sẵn cho bạn:<br>
         · Việc cần làm mỗi ngày<br>
         · Cách tìm khách đầu tiên<br>
         · Cách tránh mất thời gian
       </div>
-      <div class="chat-limit-urgency">⚠️ Nếu không bắt đầu hôm nay, bạn sẽ tiếp tục đứng yên</div>
-      <button class="chat-lock-btn" onclick="showPaywall()">👉 Mở khóa cách bạn kiếm tiền – 49k</button>
-      <div class="chat-limit-note">Chỉ bằng 1 ly trà sữa ☕</div>
+
+      <!-- Urgency -->
+      <div class="clw-urgency">
+        <span class="clw-urgency-dot"></span>
+        <span>Nếu không bắt đầu hôm nay, bạn sẽ tiếp tục đứng yên</span>
+      </div>
+
+      <!-- CTA -->
+      <button class="pw-cta" onclick="showPaywall()" type="button" style="margin-bottom:10px">
+        👉 Mở khóa cách bạn kiếm tiền — 49k
+      </button>
+      <div class="pw-anchor">= 1 ly trà sữa · hoàn tiền 3 ngày 🛡️</div>
+
     </div>
 
     <div class="quick-prompts" id="chat-quick-prompts">
@@ -2899,6 +2970,61 @@ Ai cần thì tham khảo nhé 👇</div>
     <div class="apikey-status" id="apikey-status">
       <div class="apikey-status-dot" id="apikey-dot"></div>
       <span id="apikey-status-txt">Chưa có key</span>
+    </div>
+  </div>
+</div>
+
+<!-- INTAKE FORM — hiện sau khi unlock -->
+<div class="paywall-overlay" id="intake-overlay">
+  <div class="paywall-sheet" style="background:#fff;">
+    <div class="paywall-sticky-nav">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text)">✦ Tạo kế hoạch của bạn</div>
+      <button class="pw-nav-close" onclick="skipIntake()" type="button">×</button>
+    </div>
+
+    <div style="padding:20px 20px 0;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;">3 câu hỏi · 2 phút</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin-bottom:4px;">AI sẽ tạo kế hoạch<br>kiếm tiền riêng cho bạn</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:20px;">Trả lời càng thật → kế hoạch càng sát thực tế</div>
+
+      <!-- Q1: Thu nhập -->
+      <div class="intake-field">
+        <div class="intake-label">Thu nhập hiện tại / tháng</div>
+        <div class="intake-opts" id="intake-income">
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-income')">Dưới 10 triệu</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-income')">10–20 triệu</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-income')">20–40 triệu</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-income')">Trên 40 triệu</div>
+        </div>
+      </div>
+
+      <!-- Q2: Vấn đề chính -->
+      <div class="intake-field">
+        <div class="intake-label">Vấn đề lớn nhất hiện tại</div>
+        <div class="intake-opts" id="intake-problem">
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-problem')">Không biết bắt đầu từ đâu</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-problem')">Có skill nhưng chưa ra tiền</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-problem')">Thiếu thời gian</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-problem')">Thu nhập không ổn định</div>
+        </div>
+      </div>
+
+      <!-- Q3: Mục tiêu cụ thể -->
+      <div class="intake-field">
+        <div class="intake-label">Mục tiêu trong 30 ngày tới</div>
+        <div class="intake-opts" id="intake-target">
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-target')">Kiếm được đơn đầu tiên</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-target')">Thêm 2–5 triệu/tháng</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-target')">Thêm 5–15 triệu/tháng</div>
+          <div class="intake-opt" onclick="intakeSelect(this,'intake-target')">Xây nguồn thu thụ động</div>
+        </div>
+      </div>
+
+      <button class="pw-cta" id="intake-submit-btn" onclick="submitIntake()" type="button" style="margin-bottom:12px;">
+        ✦ Tạo kế hoạch của tôi ngay
+      </button>
+
+      <div class="pw-anchor" style="margin-bottom:20px;">AI sẽ phân tích và tạo plan trong ~10 giây</div>
     </div>
   </div>
 </div>
@@ -3646,31 +3772,196 @@ function confirmPayment() {
   isUnlocked = true;
   sessionStorage.setItem('moneyos_unlocked', 'true');
   document.getElementById('paywall-overlay').classList.remove('show');
-  // Also dismiss FW paywall if open
   document.getElementById('fw-paywall-overlay').classList.remove('show');
   document.body.style.overflow = '';
+
+  // Unlock UI
   buildTodayUI();
-  // Re-render locked content as unlocked
   applyCoachLockState();
-  hideChatLimitWall(); // Mở chat input khi unlock
+  hideChatLimitWall();
   if (userProfile) {
-    const opps = getFallbackOpps();
-    renderOpportunities(opps);
-    renderPlan([
-      { title:'Tạo hồ sơ Freelancer',   desc:'Đăng ký Upwork hoặc Fiverr, điền đầy đủ thông tin', time:'45 phút', status:'done'  },
-      { title:'Xác định dịch vụ & giá', desc:'Chọn 2–3 dịch vụ dựa trên kỹ năng mạnh nhất',       time:'30 phút', status:'doing' },
-      { title:'Tạo 1 portfolio mẫu',    desc:'Làm 1 sản phẩm demo để client thấy chất lượng',     time:'2 giờ',   status:'todo'  },
-      { title:'Gửi 5 đề xuất đầu tiên', desc:'Ứng tuyển vào 5 job phù hợp trên platform',         time:'1 giờ',   status:'todo'  },
-    ]);
-    // Init chat now that it's unlocked
-    document.getElementById('chat-messages').innerHTML = '';
-    setTimeout(() => initChat(), 100);
+    renderOpportunities(getFallbackOpps());
   }
-  showToast('🎉 Đã mở khóa! Bắt đầu kiếm tiền thôi.');
   saveState();
+  showToast('🎉 Đã mở khóa!');
+
+  // Show intake form để collect thêm info → generate plan
   setTimeout(() => {
-    document.querySelectorAll('.today-task').forEach(el => el.classList.add('task-unlocked-flash'));
-  }, 200);
+    document.getElementById('intake-overlay').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }, 600);
+}
+
+// ── INTAKE FORM ──────────────────────────────────
+function intakeSelect(el, groupId) {
+  document.querySelectorAll(`#${groupId} .intake-opt`).forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function skipIntake() {
+  document.getElementById('intake-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  // Generate plan with existing profile data
+  generateMoneyPlan(null);
+  navTo('coach');
+}
+
+async function submitIntake() {
+  const income  = document.querySelector('#intake-income .intake-opt.on')?.textContent;
+  const problem = document.querySelector('#intake-problem .intake-opt.on')?.textContent;
+  const target  = document.querySelector('#intake-target .intake-opt.on')?.textContent;
+
+  if (!income || !problem || !target) {
+    showToast('⚠ Chọn đủ 3 câu nhé!'); return;
+  }
+
+  const btn = document.getElementById('intake-submit-btn');
+  btn.textContent = '⏳ AI đang phân tích...';
+  btn.disabled = true;
+
+  document.getElementById('intake-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  navTo('coach');
+
+  await generateMoneyPlan({ income, problem, target });
+}
+
+async function generateMoneyPlan(intake) {
+  const p = userProfile || {};
+  const inc  = intake?.income  || p.goal || '10–20 triệu';
+  const prob = intake?.problem || 'Chưa biết bắt đầu từ đâu';
+  const tgt  = intake?.target  || p.goal || 'Kiếm thêm thu nhập';
+
+  const prompt = `Bạn là Money OS AI Coach chuyên giúp người dùng kiếm thêm thu nhập.
+
+Thông tin user:
+- Thu nhập: ${inc}
+- Nghề nghiệp: ${p.job || 'Chưa rõ'}
+- Kỹ năng: ${p.skills?.join(', ') || 'Chưa rõ'}
+- Thời gian rảnh: ${p.time || 'Chưa rõ'}/tuần
+- Vấn đề chính: ${prob}
+- Mục tiêu: ${tgt}
+
+Nhiệm vụ:
+1. Phân tích user đang mất bao nhiêu tiền mỗi tháng — con số cụ thể (VNĐ), breakdown 2–3 nguồn chính
+2. Xác định ít nhất 2 cơ hội tăng thu nhập phù hợp với profile — ước tính rõ số tiền (VNĐ/tháng), ưu tiên làm ngay được
+3. Tạo kế hoạch hành động 7 ngày — 3–5 bước, mỗi bước làm trong 10–30 phút
+
+Format bắt buộc (giữ đúng emoji và dấu ---):
+
+⚠️ Bạn đang mất ~X VNĐ/tháng
+(giải thích ngắn gọn, cụ thể)
+
+---
+
+💡 Cơ hội cho bạn:
+
+1. [tên cơ hội]
+→ +X VNĐ/tháng
+
+2. [tên cơ hội]
+→ +X VNĐ/tháng
+
+---
+
+🚀 Kế hoạch 7 ngày:
+
+Day 1: [hành động cụ thể]
+Day 2: [hành động cụ thể]
+Day 3: [hành động cụ thể]
+Day 4: [hành động cụ thể]
+Day 5–7: [hành động cụ thể]
+
+---
+
+🔥 Nếu bạn không thay đổi:
+→ Bạn sẽ tiếp tục mất ~X VNĐ/tháng (~Y VNĐ/ngày)
+
+Quan trọng: không chung chung, không lặp ý, không dài dòng. Viết như đang nói trực tiếp với user. Mỗi câu phải có giá trị thực tế.`;
+
+  // Show typing in chat
+  const c = document.getElementById('chat-messages');
+  if (c) {
+    c.innerHTML = '';
+    appendMsg('ai', '✦ Đang phân tích hồ sơ của bạn và tạo kế hoạch...');
+  }
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const plan = data.content?.map(x => x.text || '').join('') || '';
+
+    removeTyping();
+    if (c) c.innerHTML = '';
+    appendMsg('ai', plan);
+
+    // Parse Day 1 action → set as today task
+    const day1Match = plan.match(/Day 1[:\s]+(.+)/);
+    if (day1Match) {
+      const day1Action = day1Match[1].trim();
+      todayTasks = [
+        { title: day1Action, meta: 'Từ Money Plan của bạn · hôm nay', state: 'pending' },
+        ...todayTasks.slice(0, 2)
+      ];
+      buildTodayUI();
+      syncHomeTodayCard();
+      saveState();
+    }
+
+    // Parse Day 2–7 → update plan steps
+    const steps = [];
+    const dayMatches = [...plan.matchAll(/Day (\d+(?:–\d+)?)[:\s]+(.+)/g)];
+    dayMatches.forEach((m, i) => {
+      steps.push({ title: `Day ${m[1]}`, desc: m[2].trim(), time: '20 phút', status: i === 0 ? 'doing' : 'todo' });
+    });
+    if (steps.length > 0) renderPlan(steps);
+
+  } catch(e) {
+    removeTyping();
+    appendMsg('ai', `Không thể tạo plan lúc này. Hãy thử lại hoặc hỏi tôi trực tiếp!`);
+  }
+}
+
+// ── DEV: secret unlock (nhấn logo 5 lần) ──
+let _devTaps = 0, _devTimer;
+function devUnlockTap() {
+  _devTaps++;
+  clearTimeout(_devTimer);
+  _devTimer = setTimeout(() => { _devTaps = 0; }, 2000);
+  if (_devTaps >= 5) {
+    _devTaps = 0;
+    if (isUnlocked) {
+      // Toggle off
+      isUnlocked = false;
+      sessionStorage.removeItem('moneyos_unlocked');
+      clearState();
+      showToast('🔒 Dev: Locked');
+      applyCoachLockState();
+      if (userProfile) { renderOpportunities(getFallbackOpps()); }
+    } else {
+      isUnlocked = true;
+      sessionStorage.setItem('moneyos_unlocked', 'true');
+      saveState();
+      showToast('🔓 Dev: Unlocked — Pro mode ON');
+      applyCoachLockState();
+      hideChatLimitWall();
+      if (userProfile) { renderOpportunities(getFallbackOpps()); }
+    }
+  }
 }
 
 // ══════════════════════════════════════
@@ -4396,7 +4687,6 @@ function showChatLimitWall() {
   const inputRow  = document.getElementById('chat-input-row');
   const quickP    = document.getElementById('chat-quick-prompts');
 
-  // Personalize title with skill-based income
   if (userProfile) {
     const incomeMap = {
       'Viết lách':'2–4 triệu', 'Thiết kế':'3–6 triệu', 'Lập trình':'5–12 triệu',
@@ -4407,7 +4697,9 @@ function showChatLimitWall() {
     const skill = userProfile.skills?.[0];
     const earn  = incomeMap[skill] || userProfile.goal || '1–3 triệu';
     const titleEl = document.getElementById('chat-limit-title');
+    const earnEl  = document.getElementById('chat-limit-earn');
     if (titleEl) titleEl.textContent = `🔥 Bạn đang rất gần ${earn}/tháng`;
+    if (earnEl)  earnEl.textContent  = earn.replace('/tháng','');
   }
 
   if (limitWall) limitWall.style.display = '';

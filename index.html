@@ -4712,15 +4712,22 @@ function detectIntent(text) {
 let freeReplyCount = 0;
 function getUpsellNudge(profile) {
   const skill = profile?.skills?.[0] || 'kỹ năng của bạn';
+  const job   = profile?.job || 'công việc hiện tại';
   const incomeMap = {
     'Viết lách':'2–4 triệu', 'Thiết kế':'3–6 triệu', 'Lập trình':'5–12 triệu',
     'Dạy học':'2–4 triệu', 'Bán hàng':'2–5 triệu', 'Chụp ảnh/Video':'2–5 triệu',
     'Tài chính':'3–7 triệu', 'Ngoại ngữ':'2–4 triệu', 'Mạng xã hội':'2–4 triệu',
     'Excel / Data':'3–6 triệu'
   };
-  const earn = incomeMap[skill] || '1–3 triệu';
+  const earn = incomeMap[skill] || profile?.goal || '1–3 triệu';
 
-  return `🔥 Bạn đang rất gần **${earn}/tháng**\n\nChỉ cần làm đúng 3 bước này, bạn có thể bắt đầu kiếm tiền trong **7 ngày tới**.\n\nAI đã chuẩn bị sẵn cho bạn:\n· Việc cần làm mỗi ngày\n· Cách tìm khách đầu tiên\n· Cách tránh mất thời gian\n\n⚠️ Nếu không bắt đầu hôm nay, bạn sẽ tiếp tục đứng yên.\n\nMở khóa để xem toàn bộ kế hoạch ngay bên dưới 👇`;
+  return `⚠️ Bạn đang bỏ lỡ ~**${earn}/tháng**
+
+Hầu hết người làm **${job}** như bạn đã có sẵn kỹ năng **${skill}** này — nhưng chưa biết cách kiếm tiền từ nó.
+
+Tôi đã chuẩn bị sẵn plan cho bạn:
+→ Chỉ cần 30 phút/ngày
+→ Bắt đầu kiếm tiền trong 7 ngày tới`;
 }
 
 // ── CHAT FUNCTIONS ────────────────────────────────────────

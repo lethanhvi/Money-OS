@@ -3686,57 +3686,68 @@ function handleUnlock() {
 }
 
 function showPaymentInstructions() {
-  // Reuse paywall overlay for payment screen
   const overlay = document.getElementById('paywall-overlay');
   overlay.innerHTML = `
-    <div class="paywall-sheet">
-      <div class="paywall-hero">
-        <div class="paywall-handle"></div>
-        <div class="paywall-badge">💳 Thanh toán</div>
-        <div class="paywall-headline" style="font-size:19px;">
-          Chuyển khoản <span>49.000đ</span><br>để mở khóa
-        </div>
-        <div class="paywall-subline">Xác nhận tự động trong vòng 5 phút</div>
-      </div>
-      <div class="paywall-body">
+    <div class="paywall-sheet" style="background:#fff;">
 
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;">
-          <div style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">THÔNG TIN CHUYỂN KHOẢN</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
+      <!-- Sticky nav -->
+      <div class="paywall-sticky-nav">
+        <button class="pw-nav-home" onclick="dismissPaymentScreen()" type="button">← Quay lại</button>
+        <button class="pw-nav-close" onclick="dismissPaymentScreen()" type="button">×</button>
+      </div>
+
+      <!-- Header -->
+      <div style="padding:20px 20px 0;text-align:center;">
+        <div style="font-size:36px;margin-bottom:10px;">💳</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text);margin-bottom:4px;">Chuyển khoản 49.000đ</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">để mở khóa toàn bộ tính năng</div>
+      </div>
+
+      <div style="padding:16px 20px 0;">
+
+        <!-- Bank info card -->
+        <div style="background:linear-gradient(135deg,#f0f6ff,#e8f2ff);border:1.5px solid rgba(21,101,192,0.2);border-radius:16px;padding:18px;margin-bottom:14px;">
+          <div style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">THÔNG TIN CHUYỂN KHOẢN</div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Ngân hàng</span>
-              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">ACB</span>
+              <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Ngân hàng</span>
+              <span style="font-size:14px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif;">ACB</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Số tài khoản</span>
-              <span style="font-size:13px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace;" onclick="copyText('258413829',this)">258413829 ✦</span>
+              <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Số tài khoản</span>
+              <button onclick="copyText('258413829',this)" type="button" style="font-size:15px;font-weight:800;color:var(--blue);font-family:'DM Mono',monospace;background:none;border:none;cursor:pointer;padding:4px 8px;background:rgba(21,101,192,0.08);border-radius:6px;touch-action:manipulation;">258413829 ✦</button>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Tên</span>
-              <span style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">LE THANH VI</span>
+              <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Tên</span>
+              <span style="font-size:13px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif;">LE THANH VI</span>
+            </div>
+            <div style="height:1px;background:rgba(21,101,192,0.1);"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Số tiền</span>
+              <span style="font-size:22px;font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;">49.000đ</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Số tiền</span>
-              <span style="font-size:16px;font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;">49.000đ</span>
-            </div>
-            <div style="height:1px;background:var(--border);margin:4px 0;"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Nội dung</span>
-              <span style="font-size:12px;font-weight:600;color:var(--green);font-family:'DM Mono',monospace;" onclick="copyText('MONEYOS PRO',this)">MONEYOS PRO ✦</span>
+              <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Nội dung</span>
+              <button onclick="copyText('MONEYOS PRO',this)" type="button" style="font-size:12px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;background:var(--green-dim);border:1px solid rgba(0,176,116,0.25);border-radius:6px;padding:4px 10px;cursor:pointer;touch-action:manipulation;">MONEYOS PRO ✦</button>
             </div>
           </div>
         </div>
 
-        <div style="background:var(--green-dim);border:1px solid rgba(0,176,116,0.2);border-radius:10px;padding:11px 14px;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start;">
-          <span style="font-size:15px;flex-shrink:0;">✅</span>
-          <span style="font-size:11px;color:var(--green);font-family:'DM Mono',monospace;line-height:1.6;">Sau khi chuyển khoản, nhấn "Đã thanh toán" — tài khoản sẽ được mở khóa ngay.</span>
+        <!-- Tip -->
+        <div style="background:var(--green-dim);border:1px solid rgba(0,176,116,0.2);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start;">
+          <span style="flex-shrink:0;font-size:16px;">✅</span>
+          <span style="font-size:12px;color:var(--green);font-family:'DM Mono',monospace;line-height:1.6;">Nhấn vào số TK hoặc nội dung để copy. Sau khi chuyển khoản → nhấn nút bên dưới.</span>
         </div>
 
-        <button class="paywall-cta" onclick="confirmPayment()" style="margin-bottom:10px;">
+        <!-- CTA -->
+        <button class="pw-cta" onclick="confirmPayment()" type="button" style="margin-bottom:10px;">
           ✅ Đã chuyển khoản — Mở khóa ngay
         </button>
 
-        <div class="paywall-skip" onclick="dismissPaymentScreen()">← Quay lại</div>
+        <div style="text-align:center;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;padding-bottom:8px;">
+          🛡️ Hoàn tiền nếu không thấy giá trị trong 3 ngày
+        </div>
       </div>
     </div>
   `;

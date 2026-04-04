@@ -4739,21 +4739,20 @@ Quy tắc trả lời:
 
   try {
     const data = await callAI({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: sys,
-        messages: chatHistory
-      });
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: sys,
+      messages: chatHistory
+    });
 
-    if (!res.ok) throw new Error('API error');
-    const reply = data.content.map(c => c.text || '').join('');
+    const reply = data.content?.map(c => c.text || '').join('') || '';
+    if (!reply) throw new Error('Empty response');
 
     removeTyping();
     appendMsg('ai', reply);
     chatHistory.push({ role:'assistant', content:reply });
     btn.disabled = false;
 
-    // Đếm lượt — chỉ tính khi free user
     if (!isUnlocked) {
       freeReplyCount++;
       if (freeReplyCount >= 2) {
@@ -4767,20 +4766,11 @@ Quy tắc trả lời:
 
   } catch(e) {
     removeTyping();
-    freeReplyCount++;
-    // Fallback: dùng rule-based đọc đúng câu hỏi
-    const reply = getRuleBasedReply(text);
-    appendMsg('ai', reply);
-    chatHistory.push({ role:'assistant', content:reply });
     btn.disabled = false;
-
-    if (!isUnlocked && freeReplyCount >= 2) {
-      const nudge = getUpsellNudge(userProfile);
-      setTimeout(() => {
-        appendMsg('ai', nudge);
-        setTimeout(() => showChatLimitWall(), 700);
-      }, 900);
-    }
+    appendMsg('ai', e.message?.includes('API Key')
+      ? '🔑 Cần nhập API Key để dùng chat (nhấn nút 🔑 góc trên phải)'
+      : '⚠️ Không kết nối được AI lúc này. Thử lại sau ít phút nhé!'
+    );
   }
 }
 

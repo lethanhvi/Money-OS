@@ -4387,8 +4387,8 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  // Check free limit BEFORE sending (for free users)
-  if (!isUnlocked && !getApiKey() && freeReplyCount >= 2) {
+  // Block nếu đã dùng hết 2 lượt free
+  if (!isUnlocked && freeReplyCount >= 2) {
     showChatLimitWall();
     return;
   }
@@ -4401,44 +4401,64 @@ async function sendMessage() {
   btn.disabled = true;
   showTyping();
 
-  // If user has API key → use real AI (unlimited)
-  if (getApiKey()) {
-    const sys = `Bạn là AI Income Coach của MoneyOS. Giúp người dùng tìm và phát triển nguồn thu nhập thêm.
-Hồ sơ: Tên: ${userProfile.name}, Nghề: ${userProfile.job}, Kỹ năng: ${userProfile.skills.join(', ')}, Thời gian: ${userProfile.time}/tuần, Mục tiêu: ${userProfile.goal}/tháng.
-Trả lời bằng tiếng Việt. Ngắn gọn (3–4 câu). Cụ thể, có thể hành động ngay. Đề xuất số tiền cụ thể và action rõ ràng.`;
+  const sys = `Bạn là Income Coach của MoneyOS — ứng dụng giúp người Việt kiếm thêm thu nhập.
+Hồ sơ user: Tên: ${userProfile.name}, Nghề: ${userProfile.job}, Kỹ năng: ${userProfile.skills.join(', ')}, Thời gian rảnh: ${userProfile.time}/tuần, Mục tiêu: ${userProfile.goal}/tháng.
+Trả lời bằng tiếng Việt. Ngắn gọn 3–4 câu. Cụ thể, thực tế, có thể làm ngay. Đề xuất số tiền VNĐ cụ thể và 1 hành động rõ ràng.`;
 
-    try {
-      const data = await aiPost({ model:'claude-sonnet-4-20250514', max_tokens:400, system:sys, messages:chatHistory });
-      const reply = data.content.map(c=>c.text||'').join('');
-      removeTyping();
-      appendMsg('ai', reply);
-      chatHistory.push({ role:'assistant', content:reply });
-      btn.disabled = false;
-      return;
-    } catch(e) {
-      // Fall through to rule-based if API fails
-    }
-  }
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: sys,
+        messages: chatHistory
+      })
+    });
 
-  // Free user → rule-based engine (simulate thinking delay)
-  const delay = 600 + Math.random() * 800;
-  setTimeout(() => {
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const reply = data.content.map(c => c.text || '').join('');
+
     removeTyping();
+    appendMsg('ai', reply);
+    chatHistory.push({ role:'assistant', content:reply });
+    btn.disabled = false;
+
+    // Đếm lượt — chỉ tính khi free user
+    if (!isUnlocked) {
+      freeReplyCount++;
+      if (freeReplyCount >= 2) {
+        const nudge = getUpsellNudge(userProfile);
+        setTimeout(() => {
+          appendMsg('ai', nudge);
+          setTimeout(() => showChatLimitWall(), 700);
+        }, 900);
+      }
+    }
+
+  } catch(e) {
+    removeTyping();
+    // Fallback rule-based nếu API fail
     freeReplyCount++;
     const reply = getRuleBasedReply(text);
     appendMsg('ai', reply);
     chatHistory.push({ role:'assistant', content:reply });
     btn.disabled = false;
 
-    // After 2 replies → send hook message then lock
-    if (!isUnlocked && !getApiKey() && freeReplyCount >= 2) {
+    if (!isUnlocked && freeReplyCount >= 2) {
       const nudge = getUpsellNudge(userProfile);
       setTimeout(() => {
         appendMsg('ai', nudge);
-        setTimeout(() => showChatLimitWall(), 600);
-      }, 800);
+        setTimeout(() => showChatLimitWall(), 700);
+      }, 900);
     }
-  }, delay);
+  }
 }
 
 function showChatLimitWall() {

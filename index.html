@@ -3789,19 +3789,59 @@ function dismissPaymentScreen() {
   location.reload(); // simple reset for MVP
 }
 
-// ── ACTIVATION CODE SYSTEM ──────────────────────
-// Mỗi mã dùng 1 lần — thêm mã mới khi có user trả tiền
-// Định dạng: hash SHA-256 của mã thật (không lưu mã thật trong code)
-// Để tạo hash: https://emn178.github.io/online-tools/sha256.html
-
-const VALID_CODE_HASHES = [
-  // Thêm hash SHA-256 của các mã bạn tạo vào đây
-  // Ví dụ: mã "MOS001" → hash tương ứng
-  // Hướng dẫn: tạo mã ngẫu nhiên 6-8 ký tự → hash → paste hash vào đây
-];
-
-// Mã master cho dev/test (hash của "DEVTEST")
-const DEV_HASH = 'a4e8e1f7e8c9d0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5';
+// ── ACTIVATION CODE SYSTEM — mỗi user 1 mã riêng ──
+const VALID_CODE_HASHES = new Set([
+  '19ca7d67e5286926e6e25f9f8a21e91da70fb27cee6324bd5e2e3b84bb6d7f5a', // MOSXUB6M
+  '22343a1985e6e4a367e54c5a4ef12183ceadaf082a9172e14faafdcec2a70f39', // MOSEVMXA
+  'c1732ae588214fcea5c1fd6190830cbd4f4ff36a7e4f5fbab880eeef0be150c4', // MOSZFP99
+  'f06ee1a39a122281861dd314e85600f44d648c670330e83fa22d5edcd4a31b88', // MOSMMP4E
+  'e850207dd4f500f89ddf5f42abdef35144c4bcbe58147a75225f5a893761e97d', // MOSY6A9A
+  '3b51ecfa308f491208cad36dcc7ff8dc4353e6317e37abcb9703f1e28cba3d8b', // MOSS9YGQ
+  '88a8cf5e29b1a8b7188ad4306e3f62ca1088fb120880eb3fcf7423b8b8a153cf', // MOSZV9WD
+  '1730d9b48e4815f3d73337458063c6b311a54f2ebe22448295227c912551b50b', // MOSYN7DD
+  '7a7efa3048861dfcca87afe9accabbc28aa096928ce0cb293949705d6ea7385d', // MOST2BFJ
+  '1fb7485dbf1a8cdb1510004cd3509bd2e5b32cfdf225bf3e7d70a7718bdcd7b8', // MOS59RPT
+  '984c31b93d3d8aad89fe96fbca093fd3a0f2ae64ba7e01bb541c66d516e2da4b', // MOSCXJ3C
+  'e80b52e9201a44c9f4bdcb84d422f9c6af332151162c01ce5027e5c9ff074a13', // MOST4RGZ
+  'aa6a974d55720422571339675cbb87b62c32db7e9c1ad530c675c97a0eefcf50', // MOSP9M4G
+  '11a87b93ace7ee9b3ecafde2e602ba104dbdb98e274fd4700b663519300858e1', // MOSJBK47
+  '9340fb533c70f86ede148baf2b72b3b16c12182c636bdaf01eaf212db5059084', // MOSG6C8Q
+  'c3aab5626dbd037a5027878f5b98e8030d07e8db654bd5e24063c8bef928315f', // MOSHNVBX
+  '6fd9c9a031d65c07c5a7ba00a9b082efff70b4b664f065f723a8fcac9bfa3202', // MOSDBE8R
+  '4595a9fa888621270196d9964d1b4c14f5913f9bf16631a3c63bf712623e1b6e', // MOSVD2JE
+  '3782777fe85b39b21abc43d3ff12971a58eb8512297cea64dc05108190cea176', // MOS5UDFL
+  '5bff3f9520784adf08e4b0d323f7e53eee34e94b57333215a4914b420775c4f7', // MOSA4VND
+  'cfb1ef327a2a4c23adf6cc02ebde0af3de3b6091aabd22c1653e9d4e871134a9', // MOSU57JP
+  'ecadab6b2589cadc0314444313ee0eb355a993c819f15ab9ce765703a34f9cb0', // MOS9TQJT
+  '945d428011fa3adda50dd27eec60d73d7302b2dec47349e1cee0c0b0bd99f1c0', // MOSNHPD7
+  'a893576b8dde0fc18f5df1961be0c31b6eb6ea9891bb297dbfbaa3bac0d66137', // MOSHUUG9
+  'b47f429e7774133f175983f7806d04ae6b57be2b40c01d1ffa68b878c2d46be2', // MOSB78U6
+  'f5c42687fd243e534bd6cddb09e5292f2afdcdbe8e56eefa4c402e8aaae2d36f', // MOSYKLWB
+  '1398641f03f562309457272ec55c0cdea6051418194bbf0ea6f3b87f53624beb', // MOSZKUGD
+  'b29da0bfe765efe291aeb8c9c0cc89f51df22b9b4c74be32684fd886f5d690d3', // MOSQ6HAA
+  'ebbf984e3392f1c2c8f5932aeedc5d9dc49fdfcb0452e0b633f0a27d841b7fcd', // MOS23RXX
+  '4b5cd44716a80ec63cfbcd5f4eb83fba6744654e601a677a86bcfb7acaf38036', // MOS6SWTB
+  '23eeca02cf357eef61e8f0d2be5100f8867f86bd3e1aeeb1b0bd8093cc49b87a', // MOSC9MTB
+  '58bea88815abe6c7b8beda0b5330a8deb2d25a3499425624b2d0f678266453b1', // MOSERFWX
+  '9e158ec6969658af4210da0b67cfe7e764144e3a127d0e84d935ee112dc9415a', // MOST8FHL
+  'd66fcc08f6ab8dfa41da8b40b467762097a8e7760922aa514fd40963403e4abb', // MOSGFC9Q
+  'e1c43500e9f5d987e9f8a4510a49ada0efd1a01ca4d4116eb99be0f738b64f32', // MOSWEPSK
+  '785064b5ed818dfe56deaeefe0c3b99ee8f450295430e891fe5b4fd0f0893177', // MOSHPB3J
+  '40b3e65ba91c26e59c63d0f72f6c61c2392cf22dae9764b4789248e93311fd2d', // MOSBRZ6M
+  'd03d6521267fe9190e87851d123c69402f01affa5c2f413328f940b72a139c55', // MOSSPMN9
+  '3e951018766b65eee53edaed61b9861480a7c94e03302ddbcfb1d1806a42b716', // MOSDC3VP
+  'fa4e92f06aa361d7387ac14d427b150ada3d11567b430a49ad60751c438edd12', // MOSFRJUG
+  'ca1e1c19f8574b59ade248288c104800b524a00fe896e1dfd9564297013826fb', // MOS52GAR
+  '79786cba670c0e9b4044ced88648f4e19c230a44ebb82eb673e0044a71ca8d51', // MOSRMPN6
+  '660df35f914303b80b6af8c8268521e415a17511a1fb23d1ff312904a8058289', // MOSCKWWY
+  '008352cb043d77f8a94e9b0ef582c1e88eff16f16fe5810dcadf016bf530d624', // MOSJPKD8
+  'dc760c9ee0f123ce1a684c097bf552c8314a8d8d49b31b31785333178682bf0e', // MOSBGSP8
+  '1d6e4df9d725dedf4dd1a9d411506c23ef47aaab23dc336269742077682336a3', // MOS6WXFP
+  'fc6e4a805c5ac6359c2fcc49f7c2f828288e7c48af917b80b64d75a200390040', // MOSMUPB3
+  'ccc8db7a30bddeb70005f200b530d06b97059b57437e7d8b46bcb03cf0506165', // MOSG85TG
+  '30961606f9dd43da7cf917789ad1fec9afc77e4253750963f9d05532bc63a984', // MOS6TMF4
+  '11895af91ffe5770cfb30c6ac6c5dec9df5f92af7bdef8b53fea23235db8c9bc', // MOSSHZ9H
+]);
 
 async function hashCode(code) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code.toUpperCase().trim()));
@@ -3818,27 +3858,23 @@ async function verifyActivationCode() {
     return;
   }
 
+  // Check already used
+  const usedCodes = JSON.parse(localStorage.getItem('moneyos_used_codes') || '[]');
   const hash = await hashCode(code);
 
-  // Check used codes
-  const usedCodes = JSON.parse(localStorage.getItem('moneyos_used_codes') || '[]');
   if (usedCodes.includes(hash)) {
-    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã này đã được sử dụng rồi.'; }
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã này đã được sử dụng trên thiết bị khác.'; }
     return;
   }
 
-  // Validate
-  const isValid = VALID_CODE_HASHES.includes(hash);
-
-  if (isValid) {
-    // Mark code as used
+  if (VALID_CODE_HASHES.has(hash)) {
+    // Đánh dấu đã dùng
     usedCodes.push(hash);
     localStorage.setItem('moneyos_used_codes', JSON.stringify(usedCodes));
     confirmPayment();
   } else {
-    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã không đúng. Kiểm tra lại hoặc nhắn Zalo để được hỗ trợ.'; }
-    input.style.borderColor = 'var(--red)';
-    setTimeout(() => { if (input) input.style.borderColor = ''; }, 2000);
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã không đúng. Kiểm tra lại hoặc nhắn Zalo 0921 634 984.'; }
+    if (input) { input.style.borderColor = 'var(--red)'; setTimeout(() => { input.style.borderColor = ''; }, 2000); }
   }
 }
 
@@ -4049,21 +4085,7 @@ async function devUnlockTap() {
   clearTimeout(_devTimer);
   _devTimer = setTimeout(() => { _devTaps = 0; }, 2000);
 
-  if (_devTaps === 7) {
-    // 7 lần → tạo mã kích hoạt mới để gửi cho user
-    _devTaps = 0;
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    const hash = await hashCode(code);
-    // Hiện mã + hash để paste vào VALID_CODE_HASHES
-    const msg = `MÃ MỚI: ${code}\n\nHash (paste vào VALID_CODE_HASHES):\n"${hash}"`;
-    alert(msg);
-    navigator.clipboard?.writeText(hash).catch(()=>{});
-    return;
-  }
-
-  if (_devTaps === 5) {
+  if (_devTaps >= 5) {
     _devTaps = 0;
     if (isUnlocked) {
       isUnlocked = false;
@@ -4076,7 +4098,7 @@ async function devUnlockTap() {
       isUnlocked = true;
       localStorage.setItem('moneyos_unlocked', 'true');
       saveState();
-      showToast('🔓 Dev: Unlocked — Pro mode ON');
+      showToast('🔓 Dev: Unlocked');
       applyCoachLockState();
       hideChatLimitWall();
       if (userProfile) { renderOpportunities(getFallbackOpps()); }

@@ -5227,49 +5227,53 @@ Tôi đã chuẩn bị sẵn plan cho bạn:
 // ── CHAT FUNCTIONS ────────────────────────────────────────
 
 function initChat() {
-  const p       = userProfile;
-  const profile = getAIProfile();
-  const opps    = profile.opportunities;
-  const skill   = p?.skills?.[0] || 'kỹ năng của bạn';
-  const job     = p?.job || 'công việc hiện tại';
+  const p         = userProfile;
+  const profile   = getAIProfile();
+  const opps      = profile.opportunities;
+  const skill     = p?.skills?.[0] || 'kỹ năng của bạn';
+  const job       = p?.job || 'công việc hiện tại';
   const firstName = p?.name?.split(' ').pop() || 'bạn';
+  const time      = p?.time || '5–10 giờ';
 
   const incomeMap = {
-    'Viết lách':'2–4 triệu', 'Thiết kế':'3–6 triệu', 'Lập trình':'5–12 triệu',
-    'Dạy học':'2–4 triệu', 'Bán hàng':'2–5 triệu', 'Chụp ảnh/Video':'2–5 triệu',
-    'Tài chính':'3–7 triệu', 'Ngoại ngữ':'2–4 triệu', 'Mạng xã hội':'2–4 triệu',
-    'Excel / Data':'3–6 triệu'
+    'Viết lách':      { earn:'2–4 triệu', rate:'300–500k/bài', unit:'5–8 bài/tháng' },
+    'Thiết kế':       { earn:'3–6 triệu', rate:'1–2 triệu/logo', unit:'3–5 project/tháng' },
+    'Lập trình':      { earn:'5–12 triệu', rate:'200–400k/buổi dạy', unit:'5–8 học viên/tuần' },
+    'Dạy học':        { earn:'2–4 triệu', rate:'150–250k/buổi', unit:'4–6 học viên/tuần' },
+    'Bán hàng':       { earn:'2–5 triệu', rate:'hoa hồng 10–20%', unit:'20–30 đơn/tháng' },
+    'Chụp ảnh/Video': { earn:'2–5 triệu', rate:'1–3 triệu/buổi', unit:'2–4 buổi/tháng' },
+    'Tài chính':      { earn:'3–7 triệu', rate:'2–5 triệu/báo cáo', unit:'2–3 client/tháng' },
+    'Ngoại ngữ':      { earn:'2–4 triệu', rate:'200–350k/buổi', unit:'4–6 học viên/tuần' },
+    'Mạng xã hội':    { earn:'2–4 triệu', rate:'3–6 triệu/page/tháng', unit:'2–3 client' },
+    'Excel / Data':   { earn:'3–6 triệu', rate:'1–3 triệu/project', unit:'3–5 project/tháng' },
   };
-  const earn    = incomeMap[skill] || p?.goal || '1–3 triệu';
+
+  const info    = incomeMap[skill] || { earn: p?.goal || '1–3 triệu', rate: '300–500k/task', unit: '5–10 task/tháng' };
   const bestOpp = opps[0];
-  const otherOpps = opps.slice(1, 3);
 
-  // Greeting cá nhân hóa — cảm giác AI thật sự đã đọc hồ sơ
-  const greetings = [
-    `${firstName} — tôi vừa xem xong hồ sơ của bạn.\n\nNói thẳng: với **${skill}** + **${p?.time}/tuần** rảnh, bạn đang để **${earn}/tháng** trên bàn mà không biết.`,
-    `${firstName}, tôi đã phân tích profile của bạn rồi.\n\nSự thật là: người làm **${job}** có **${skill}** như bạn — đang kiếm thêm **${earn}/tháng** ngay lúc này. Không phải vì họ giỏi hơn.`,
-    `Xem xong hồ sơ của ${firstName} rồi.\n\nBạn có điều mà 80% người muốn kiếm thêm không có: **${skill}** + thời gian. Chỉ thiếu đúng 1 thứ — biết bắt đầu từ đâu.`
-  ];
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-
-  // Opening questions để tạo loop — tuỳ theo skill
-  const openingQMap = {
-    'Lập trình': `\n\n${firstName} đã từng thử freelance chưa, hay chưa biết bắt đầu từ đâu?`,
-    'Thiết kế': `\n\n${firstName} đang có portfolio chưa, hay cần tôi giúp xây từ đầu?`,
-    'Viết lách': `\n\n${firstName} đã viết cho ai chưa — dù chỉ là blog cá nhân hay content Zalo?`,
-    'Dạy học': `\n\n${firstName} đang dạy môn gì, hay đang muốn dạy gì nhất?`,
-    'Bán hàng': `\n\n${firstName} đã từng bán online chưa — dù chỉ 1 lần?`,
+  // Hook question theo skill
+  const hookQMap = {
+    'Lập trình':      `${firstName} đã từng dạy code cho ai chưa — dù chỉ 1 người?`,
+    'Thiết kế':       `${firstName} đang có portfolio chưa, hay cần build từ đầu?`,
+    'Viết lách':      `${firstName} đã viết thuê cho ai chưa — blog, content, hay copywriting?`,
+    'Dạy học':        `${firstName} đang dạy môn gì, hay muốn dạy môn nào nhất?`,
+    'Chụp ảnh/Video': `${firstName} đã nhận job chụp ảnh/quay phim trả tiền lần nào chưa?`,
+    'Mạng xã hội':    `${firstName} đang quản lý page nào chưa — của mình hay của ai khác?`,
   };
-  const openingQ = openingQMap[skill] || `\n\n${firstName} muốn bắt đầu từ đâu — tìm client đầu tiên hay xây profile trước?`;
+  const hookQ = hookQMap[skill] || `${firstName} đã từng thử kiếm tiền từ ${skill} chưa?`;
 
-  const msg = [
-    greeting,
-    `🔥 Cách nhanh nhất cho bạn:\n\n**${bestOpp.title}**\n→ +${bestOpp.earn}\n✓ Có skill rồi · Không cần vốn · Bắt đầu trong 24h`,
-    `Đừng nghĩ tới ${earn} ngay — bắt đầu với **200k đầu tiên** thôi.\n\n(Xem template bên dưới 👇)` + openingQ,
-    otherOpps.length > 0
-      ? `Sau khi có client đầu tiên, có thể thêm:\n${otherOpps.map(o => `• ${o.title} → +${o.earn}`).join('\n')}`
-      : null
-  ].filter(Boolean).join('\n\n---\n\n');
+  const msg =
+`${firstName} — với **${skill}** + **${time}/tuần** rảnh:
+
+🔥 **${bestOpp.title}**
+→ **${info.rate}** · ${info.unit}
+→ Thu nhập thêm: **${info.earn}/tháng**
+
+Không cần vốn. Không cần kinh nghiệm bán hàng. Bắt đầu được trong **24h**.
+
+---
+
+${hookQ}`;
 
   appendMsg('ai', msg);
   freeReplyCount = 0;
@@ -5393,7 +5397,7 @@ async function sendMessage() {
   if (!text) return;
 
   // Block nếu đã dùng hết 2 lượt free
-  if (!isUnlocked && freeReplyCount >= 3) {
+  if (!isUnlocked && freeReplyCount >= 5) {
     showChatLimitWall();
     return;
   }
@@ -5455,7 +5459,7 @@ Turn thứ: ${turnCount + 1}`;
 
     if (!isUnlocked) {
       freeReplyCount++;
-      if (freeReplyCount >= 3) {
+      if (freeReplyCount >= 5) {
         const nudge = getUpsellNudge(userProfile);
         setTimeout(() => {
           appendMsg('ai', nudge);

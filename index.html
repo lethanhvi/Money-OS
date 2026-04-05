@@ -1939,6 +1939,54 @@ svg.spark { width:100%; height:54px; }
 .psych-btn.yes.active { background:rgba(255,61,90,0.2); border-color:#ff3d5a; color:#ff3d5a; }
 .psych-btn.no.active  { background:rgba(0,229,160,0.15); border-color:#00e5a0; color:#00e5a0; }
 
+/* ── HOW IT WORKS ────────────────────────── */
+.hiw-wrap {
+  margin: 0 20px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+}
+.hiw-title {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; text-align: center;
+}
+.hiw-steps {
+  display: flex; align-items: center; gap: 6px;
+}
+.hiw-step {
+  flex: 1; text-align: center;
+}
+.hiw-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue-dim); border: 1.5px solid rgba(21,101,192,0.3);
+  color: var(--blue); font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 6px;
+}
+.hiw-text {
+  font-size: 11px; color: var(--text); line-height: 1.4;
+  font-family: 'DM Mono', monospace;
+}
+.hiw-text span { color: var(--blue); font-size: 10px; }
+.hiw-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+
+/* ── TRUST BAR ───────────────────────────── */
+.trust-bar {
+  display: flex; align-items: center;
+  margin: 0 20px 16px;
+  background: linear-gradient(135deg, #f0f7ff, #e8f2ff);
+  border: 1px solid rgba(21,101,192,0.15);
+  border-radius: 12px; padding: 12px 8px;
+}
+.trust-item {
+  flex: 1; text-align: center;
+  font-size: 10px; color: var(--text2);
+  font-family: 'DM Mono', monospace; line-height: 1.5;
+}
+.trust-item strong { color: var(--blue); font-family: 'Syne', sans-serif; font-size: 11px; display: block; }
+.trust-divider { width: 1px; height: 32px; background: rgba(21,101,192,0.12); flex-shrink: 0; }
+
 /* CONFIRM RESET MODAL */
 .confirm-overlay {
   display: none; position: fixed; inset: 0;
@@ -2373,6 +2421,36 @@ svg.spark { width:100%; height:54px; }
       <path d="M0,44 C25,40 40,42 60,34 S90,26 110,22 S140,16 165,18 S195,12 220,8 S255,5 280,3 S295,2 300,2 L300,54 L0,54Z" fill="url(#sg)"/>
       <circle cx="300" cy="2" r="3.5" fill="#1565C0"/>
     </svg>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="hiw-wrap">
+    <div class="hiw-title">Hoạt động như thế nào?</div>
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-num">1</div>
+        <div class="hiw-text">Điền hồ sơ kỹ năng<br><span>2 phút</span></div>
+      </div>
+      <div class="hiw-arrow">→</div>
+      <div class="hiw-step">
+        <div class="hiw-num">2</div>
+        <div class="hiw-text">AI tạo kế hoạch<br><span>cá nhân hóa</span></div>
+      </div>
+      <div class="hiw-arrow">→</div>
+      <div class="hiw-step">
+        <div class="hiw-num">3</div>
+        <div class="hiw-text">Làm theo từng bước<br><span>ra tiền trong 7 ngày</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="trust-item">🛡️ <strong>Hoàn tiền 3 ngày</strong><br>nếu không thấy giá trị</div>
+    <div class="trust-divider"></div>
+    <div class="trust-item">🔒 <strong>Không lưu</strong><br>thông tin cá nhân</div>
+    <div class="trust-divider"></div>
+    <div class="trust-item">⚡ <strong>AI thật</strong><br>Claude Sonnet</div>
   </div>
 
   <!-- AI COACH ENTRY -->
@@ -3079,7 +3157,23 @@ Ai cần thì tham khảo nhé 👇</div>
         👉 Mở khóa cách bạn kiếm tiền — 49k
       </button>
 
-      <div class="pw-anchor">= 1 ly trà sữa · hoàn tiền trong 3 ngày nếu không hài lòng 🛡️</div>
+      <!-- Refund guarantee nổi bật -->
+      <div style="background:linear-gradient(135deg,rgba(0,176,116,0.08),rgba(0,176,116,0.04));border:1.5px solid rgba(0,176,116,0.25);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">🛡️</span>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--green);margin-bottom:3px;">Hoàn tiền 100% trong 3 ngày</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);line-height:1.6;">Nếu bạn không thấy giá trị sau khi dùng — nhắn Zalo <strong>0921 634 984</strong>, tôi hoàn tiền ngay, không hỏi lý do.</div>
+        </div>
+      </div>
+
+      <!-- Founder note -->
+      <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:18px;flex-shrink:0;">👋</span>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);line-height:1.7;">
+          <strong style="color:var(--text);font-family:'Syne',sans-serif;">Từ người build app này:</strong><br>
+          App còn mới, tôi cần feedback thật từ bạn hơn là tiền. Nếu không hữu ích — nhắn tôi, hoàn tiền ngay.
+        </div>
+      </div>
 
       <button class="pw-skip" onclick="dismissPaywall()" type="button">
         Để sau — tiếp tục dùng miễn phí

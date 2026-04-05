@@ -22,6 +22,19 @@
 <!-- Zalo share -->
 <meta property="zalo:official_account_id" content="">
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HTPK1M0NLP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-HTPK1M0NLP');
+
+  // Helper track event
+  function track(event, params) {
+    if (typeof gtag !== 'undefined') gtag('event', event, params || {});
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
@@ -3560,6 +3573,7 @@ function obGetSelected(groupId) {
 //  START AI COACH
 // ══════════════════════════════════════
 function startCoach() {
+  track("onboarding_complete", { job: document.getElementById("ob-job")?.dataset?.val || "unknown" });
   const name   = document.getElementById('ob-name').value.trim() || 'Bạn';
   const job    = obGetSelected('ob-job')[0]  || 'Chưa rõ';
   const skills = obGetSelected('ob-skills');
@@ -3857,6 +3871,7 @@ let paywallShown = false;
 function showPaywall() {
   if (paywallShown) return;
   paywallShown = true;
+  track("paywall_shown", { source: currentPage });
 
   // Personalize headline theo skill
   if (userProfile) {
@@ -3886,6 +3901,7 @@ function dismissPaywall() {
 }
 
 function handleUnlock() {
+  track("payment_initiated");
   // MVP: show payment instructions (no gateway needed yet)
   document.getElementById('paywall-overlay').classList.remove('show');
   showPaymentInstructions();
@@ -4089,6 +4105,7 @@ async function verifyActivationCode() {
 }
 
 function confirmPayment() {
+  track("purchase", { value: 49000, currency: "VND" });
   isUnlocked = true;
   localStorage.setItem('moneyos_unlocked', 'true');
   document.getElementById('paywall-overlay').classList.remove('show');
@@ -4694,6 +4711,7 @@ function fwCopyTemplate() {
 }
 
 function fwMarkDone() {
+  track("first_win_complete", { step: fwStep });
   fwStep = Math.min(fwStep + 1, FW_TOTAL);
   const pct = Math.round((fwStep / FW_TOTAL) * 100);
 
@@ -5432,6 +5450,7 @@ function copyRefLink(link, btn) {
 // Ghi nhận conversion — gọi khi user unlock thành công
 function trackReferralConversion() {
   const ref = getCurrentRef();
+  if (ref) track("referral_conversion", { referrer: ref });
   if (!ref) return;
 
   // Lưu vào localStorage để bạn xem sau
@@ -5456,8 +5475,13 @@ function generateRefLink(name) {
 // Chạy khi load app
 initReferral();
 
-// ══════════════════════════════════════
-//  STATS PAGE
+// Track app open
+track('app_open', {
+  has_profile: !!userProfile,
+  is_unlocked: isUnlocked,
+  ref: getCurrentRef() || 'direct'
+});
+
 // ══════════════════════════════════════
 function renderStatsPage() {
   const total     = streams.reduce((s,x) => s + x.amount, 0);

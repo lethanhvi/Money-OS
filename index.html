@@ -3,8 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Money OS</title>
+<title>Money OS — Kiếm thêm thu nhập với AI</title>
+<meta name="description" content="AI phân tích kỹ năng của bạn và tạo kế hoạch kiếm thêm 1–12 triệu/tháng. Cá nhân hóa 100%, bắt đầu trong 24h.">
 <meta name="theme-color" content="#f0f2f7">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://money-os-seven.vercel.app">
+<meta property="og:title" content="Money OS — Kiếm thêm thu nhập với AI">
+<meta property="og:description" content="AI phân tích kỹ năng của bạn → tạo kế hoạch kiếm thêm 1–12 triệu/tháng. Không cần vốn. Bắt đầu ngay hôm nay.">
+<meta property="og:image" content="https://money-os-seven.vercel.app/og-image.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Money OS — Kiếm thêm thu nhập với AI">
+<meta name="twitter:description" content="AI tạo kế hoạch kiếm tiền cá nhân hóa cho bạn. 0đ vốn. Bắt đầu trong 24h.">
+
+<!-- Zalo share -->
+<meta property="zalo:official_account_id" content="">
+
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,600;1,300;1,600&family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════
@@ -1839,6 +1856,76 @@ svg.spark { width:100%; height:54px; }
 }
 .intake-opt:active { transform: scale(0.96); }
 
+/* ══ STATS PAGE ══════════════════════════════ */
+.stats-hero {
+  background: linear-gradient(135deg, #1565C0, #0d47a1);
+  margin: 0 20px 16px; border-radius: 16px;
+  padding: 20px; text-align: center; color: #fff;
+}
+.stats-hero-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; opacity:0.7; margin-bottom:6px; }
+.stats-hero-val { font-family:'Syne',sans-serif; font-weight:800; font-size:32px; letter-spacing:-1px; margin-bottom:4px; }
+.stats-hero-sub { font-size:11px; opacity:0.7; font-family:'DM Mono',monospace; }
+
+.stats-3col { display:flex; margin:0 20px 16px; gap:8px; }
+.stats-col { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; }
+.stats-col-val { font-family:'Syne',sans-serif; font-weight:800; font-size:15px; margin-bottom:4px; }
+.stats-col-lbl { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; }
+
+.stats-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin:0 20px 12px; }
+.stats-card-title { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; margin-bottom:14px; }
+
+.bar-chart { display:flex; align-items:flex-end; gap:6px; height:80px; }
+.bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.bar-fill { width:100%; border-radius:4px 4px 0 0; background:var(--blue); min-height:4px; transition:height 0.5s; }
+.bar-lbl { font-size:9px; color:var(--muted); font-family:'DM Mono',monospace; }
+
+.stats-breakdown { display:flex; flex-direction:column; gap:8px; }
+.breakdown-row { display:flex; align-items:center; gap:10px; }
+.breakdown-bar-bg { flex:1; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+.breakdown-bar-fill { height:100%; border-radius:3px; transition:width 0.5s; }
+.breakdown-lbl { font-size:11px; color:var(--text2); font-family:'DM Mono',monospace; width:70px; }
+.breakdown-pct { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; width:32px; text-align:right; }
+
+.stats-insight { background:linear-gradient(135deg,rgba(21,101,192,0.06),rgba(21,101,192,0.02)); border-color:rgba(21,101,192,0.15); }
+.stats-insight-text { font-size:13px; color:var(--text2); line-height:1.7; font-family:'DM Mono',monospace; }
+
+.stats-goal-row { display:flex; flex-direction:column; gap:12px; }
+.goal-item { }
+.goal-item-top { display:flex; justify-content:space-between; margin-bottom:6px; }
+.goal-item-name { font-size:12px; font-weight:600; color:var(--text); font-family:'Syne',sans-serif; }
+.goal-item-pct { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; }
+.goal-bar-bg { height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+.goal-bar-fill { height:100%; background:linear-gradient(90deg,var(--blue),#4d9fff); border-radius:3px; transition:width 0.5s; }
+
+/* ══ BUDGET TOOL ══════════════════════════════ */
+.budget-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); margin-bottom:12px; }
+.budget-lbl { font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); }
+.budget-val { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; }
+.budget-categories { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.budget-cat-item { display:flex; align-items:center; gap:8px; background:var(--surface2); border-radius:8px; padding:8px 10px; }
+.budget-cat-name { flex:1; font-size:12px; color:var(--text); font-family:'DM Mono',monospace; }
+.budget-cat-amt { font-size:12px; color:var(--red); font-weight:600; font-family:'Syne',sans-serif; }
+.budget-cat-del { background:none; border:none; color:var(--muted); font-size:16px; cursor:pointer; padding:0 4px; }
+.budget-add-row { display:flex; gap:8px; margin-bottom:12px; align-items:center; }
+.budget-summary { background:var(--surface2); border-radius:10px; padding:12px; }
+.budget-sum-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+
+/* ══ GOALS TOOL ══════════════════════════════ */
+.goals-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.goal-card { background:var(--surface2); border-radius:10px; padding:12px; }
+.goal-card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.goal-card-name { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; }
+.goal-card-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; }
+.goal-card-nums { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; margin-top:6px; }
+
+/* ══ PSYCH CHECK ══════════════════════════════ */
+.psych-q { margin-bottom:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; }
+.psych-q-text { font-size:13px; color:#c5c9d6; margin-bottom:10px; line-height:1.5; }
+.psych-q-btns { display:flex; gap:8px; }
+.psych-btn { flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.06); color:rgba(176,184,208,0.8); font-family:'DM Mono',monospace; font-size:11px; font-weight:700; cursor:pointer; touch-action:manipulation; transition:all 0.15s; }
+.psych-btn.yes.active { background:rgba(255,61,90,0.2); border-color:#ff3d5a; color:#ff3d5a; }
+.psych-btn.no.active  { background:rgba(0,229,160,0.15); border-color:#00e5a0; color:#00e5a0; }
+
 /* CONFIRM RESET MODAL */
 .confirm-overlay {
   display: none; position: fixed; inset: 0;
@@ -2350,10 +2437,10 @@ svg.spark { width:100%; height:54px; }
   <!-- TOOLS -->
   <div class="section-hdr"><div class="section-title">Công cụ</div></div>
   <div class="tools-grid">
-    <div class="tool-card budget" onclick="showToast('Budget — sắp ra mắt!')"><div class="tool-tag tag-soon">SOON</div><div class="tool-icon">🧾</div><div class="tool-name">Budget</div><div class="tool-sub">Chi tiêu · Ngân sách</div></div>
-    <div class="tool-card goals"  onclick="showToast('Mục tiêu — sắp ra mắt!')"><div class="tool-tag tag-soon">SOON</div><div class="tool-icon">🎯</div><div class="tool-name">Mục Tiêu</div><div class="tool-sub">Tiết kiệm · Đầu tư</div></div>
+    <div class="tool-card budget" onclick="openBudgetTool()"><div class="tool-tag tag-pro">PRO</div><div class="tool-icon">🧾</div><div class="tool-name">Budget</div><div class="tool-sub">Chi tiêu · Ngân sách</div></div>
+    <div class="tool-card goals"  onclick="openGoalsTool()"><div class="tool-tag tag-pro">PRO</div><div class="tool-icon">🎯</div><div class="tool-name">Mục Tiêu</div><div class="tool-sub">Tiết kiệm · Đầu tư</div></div>
     <div class="tool-card invest" onclick="showToast('Đầu tư — sắp ra mắt!')"><div class="tool-tag tag-soon">SOON</div><div class="tool-icon">📈</div><div class="tool-name">Đầu Tư</div><div class="tool-sub">Cổ phiếu · Crypto</div></div>
-    <div class="tool-card psych"  onclick="showToast('Psych Check — sẵn sàng!')"><div class="tool-tag tag-pro">PRO</div><div class="tool-icon">🧠</div><div class="tool-name">Psych Check</div><div class="tool-sub">Pre-trade · Tâm lý</div></div>
+    <div class="tool-card psych"  onclick="openPsychCheck()"><div class="tool-tag tag-pro">PRO</div><div class="tool-icon">🧠</div><div class="tool-name">Psych Check</div><div class="tool-sub">Tâm lý · Tập trung</div></div>
   </div>
 
   <!-- ACTIVITY -->
@@ -2718,12 +2805,66 @@ Ai cần thì tham khảo nhé 👇</div>
 ═══════════════════════════════════════ -->
 <div id="page-stats" class="page">
 <div class="app-wrapper">
-  <div class="page-header"><div class="back-btn" onclick="navTo('home')">←</div><div class="page-title">Thống kê</div></div>
-  <div style="padding:50px 20px;text-align:center;color:var(--muted);">
-    <div style="font-size:48px;margin-bottom:16px;">📊</div>
-    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text2);margin-bottom:8px;">Sắp ra mắt</div>
-    <div style="font-size:13px;line-height:1.7;">Biểu đồ thu nhập nâng cao,<br>phân tích xu hướng và báo cáo tháng.</div>
+  <div class="page-header">
+    <div class="back-btn" onclick="navTo('home')">←</div>
+    <div class="page-title">Thống Kê</div>
   </div>
+
+  <!-- Tổng quan tháng -->
+  <div class="stats-hero">
+    <div class="stats-hero-label">THÁNG NÀY</div>
+    <div class="stats-hero-val" id="stats-total">0đ</div>
+    <div class="stats-hero-sub" id="stats-sub">Chưa có dữ liệu</div>
+  </div>
+
+  <!-- 3 số chính -->
+  <div class="stats-3col">
+    <div class="stats-col">
+      <div class="stats-col-val" id="stats-salary" style="color:var(--blue)">0đ</div>
+      <div class="stats-col-lbl">Lương</div>
+    </div>
+    <div class="stats-col">
+      <div class="stats-col-val" id="stats-freelance" style="color:var(--purple)">0đ</div>
+      <div class="stats-col-lbl">Freelance</div>
+    </div>
+    <div class="stats-col">
+      <div class="stats-col-val" id="stats-passive" style="color:var(--green)">0đ</div>
+      <div class="stats-col-lbl">Thụ động</div>
+    </div>
+  </div>
+
+  <!-- Bar chart 6 tháng -->
+  <div class="stats-card">
+    <div class="stats-card-title">📈 Thu nhập 6 tháng gần nhất</div>
+    <div class="bar-chart" id="bar-chart">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Phân bổ -->
+  <div class="stats-card">
+    <div class="stats-card-title">🥧 Phân bổ nguồn thu</div>
+    <div class="stats-breakdown" id="stats-breakdown">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Insight AI -->
+  <div class="stats-card stats-insight" id="stats-insight">
+    <div class="stats-card-title">✦ Nhận xét AI</div>
+    <div class="stats-insight-text" id="stats-insight-text">
+      Thêm thu nhập để nhận phân tích từ AI.
+    </div>
+  </div>
+
+  <!-- Tiến độ mục tiêu -->
+  <div class="stats-card">
+    <div class="stats-card-title">🎯 Tiến độ mục tiêu</div>
+    <div class="stats-goal-row" id="stats-goal-row">
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Chưa có mục tiêu — vào AI Coach để thiết lập</div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -3012,6 +3153,80 @@ Ai cần thì tham khảo nhé 👇</div>
   </div>
 </div>
 
+<!-- BUDGET TOOL MODAL -->
+<div class="modal-overlay" id="budget-modal" onclick="closeBudgetModal(event)">
+  <div class="modal" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🧾 Budget tháng này</div>
+    <div id="budget-content">
+      <div class="budget-row">
+        <span class="budget-lbl">Thu nhập</span>
+        <span class="budget-val" id="budget-income" style="color:var(--green)">0đ</span>
+      </div>
+      <div class="budget-categories" id="budget-cats"></div>
+      <div class="budget-add-row">
+        <input type="text" id="budget-cat-name" placeholder="Tên khoản chi..." class="field-input" style="flex:1">
+        <input type="number" id="budget-cat-amt" placeholder="Số tiền" class="field-input" style="width:110px">
+        <button onclick="addBudgetItem()" type="button" style="padding:10px 14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;touch-action:manipulation;">+</button>
+      </div>
+      <div class="budget-summary">
+        <div class="budget-sum-row">
+          <span>Tổng chi</span>
+          <span id="budget-expense" style="color:var(--red)">0đ</span>
+        </div>
+        <div class="budget-sum-row" style="font-weight:700;border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+          <span>Còn lại</span>
+          <span id="budget-remain" style="color:var(--green)">0đ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS TOOL MODAL -->
+<div class="modal-overlay" id="goals-modal" onclick="closeGoalsModal(event)">
+  <div class="modal" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎯 Mục tiêu tài chính</div>
+    <div id="goals-content">
+      <div id="goals-list"></div>
+      <div class="budget-add-row" style="flex-wrap:wrap;gap:8px;">
+        <input type="text" id="goal-name" placeholder="Tên mục tiêu..." class="field-input" style="flex:1;min-width:140px">
+        <input type="number" id="goal-target" placeholder="Số tiền mục tiêu" class="field-input" style="width:140px">
+        <input type="number" id="goal-saved" placeholder="Đã có" class="field-input" style="width:100px">
+        <button onclick="addGoal()" type="button" style="padding:10px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;touch-action:manipulation;width:100%">+ Thêm mục tiêu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PSYCH CHECK MODAL -->
+<div class="modal-overlay" id="psych-modal" onclick="closePsychModal(event)">
+  <div class="modal" style="max-height:90vh;overflow-y:auto;background:#0a0b0e;border-radius:28px 28px 0 0;">
+    <div class="modal-handle" style="background:rgba(255,255,255,0.15)"></div>
+    <div style="padding:0 20px 20px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#f0f2f7;margin-bottom:4px;">🧠 Psych Check</div>
+      <div style="font-size:11px;color:rgba(176,184,208,0.6);font-family:'DM Mono',monospace;margin-bottom:20px;">Kiểm tra trạng thái tâm lý trước khi làm việc quan trọng</div>
+
+      <div id="psych-questions"></div>
+
+      <div id="psych-result" style="display:none;text-align:center;padding:20px 0;">
+        <div id="psych-result-icon" style="font-size:48px;margin-bottom:12px;"></div>
+        <div id="psych-result-title" style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px;"></div>
+        <div id="psych-result-sub" style="font-size:13px;color:rgba(176,184,208,0.8);font-family:'DM Mono',monospace;line-height:1.7;"></div>
+        <button onclick="resetPsychCheck()" type="button" style="margin-top:16px;padding:12px 24px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:rgba(176,184,208,0.7);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;touch-action:manipulation;">↺ Làm lại</button>
+      </div>
+
+      <div id="psych-progress" style="margin-top:12px;">
+        <div style="height:3px;background:rgba(255,255,255,0.08);border-radius:2px;">
+          <div id="psych-prog-fill" style="height:100%;background:linear-gradient(90deg,#00e5a0,#4d9fff);border-radius:2px;width:0%;transition:width 0.4s;"></div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(176,184,208,0.4);margin-top:4px;" id="psych-prog-txt">0 / 5</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM RESET MODAL -->
 <div class="confirm-overlay" id="confirm-reset" onclick="closeConfirmReset(event)">
   <div class="confirm-sheet">
@@ -3271,7 +3486,6 @@ async function aiPost(body) {
 //  NAVIGATION
 // ══════════════════════════════════════
 function navTo(page) {
-  // Coach routing: go to onboard if no profile, else coach main
   if (page === 'coach') {
     if (!userProfile) {
       showPageById('coach-onboard');
@@ -3282,6 +3496,15 @@ function navTo(page) {
     }
     updateNav('coach');
     updateNavStyle('coach');
+    return;
+  }
+
+  if (page === 'stats') {
+    showPageById('stats');
+    currentPage = 'stats';
+    updateNav('stats');
+    updateNavStyle('stats');
+    setTimeout(() => renderStatsPage(), 50);
     return;
   }
 
@@ -5233,6 +5456,212 @@ function generateRefLink(name) {
 // Chạy khi load app
 initReferral();
 
+// ══════════════════════════════════════
+//  STATS PAGE
+// ══════════════════════════════════════
+function renderStatsPage() {
+  const total     = streams.reduce((s,x) => s + x.amount, 0);
+  const salary    = streams.filter(x=>x.type==='salary').reduce((s,x)=>s+x.amount,0);
+  const freelance = streams.filter(x=>x.type==='freelance').reduce((s,x)=>s+x.amount,0);
+  const passive   = streams.filter(x=>x.type==='passive').reduce((s,x)=>s+x.amount,0);
+  const fmt  = v => v >= 1000000 ? (v/1000000).toFixed(1).replace(/\.0$/,'') + 'tr' : (v/1000).toFixed(0) + 'k';
+  const fmtF = v => v.toLocaleString('vi-VN') + 'đ';
+
+  document.getElementById('stats-total').textContent = fmtF(total);
+  document.getElementById('stats-sub').textContent = total > 0 ? `${streams.length} nguồn thu nhập` : 'Chưa có dữ liệu';
+  document.getElementById('stats-salary').textContent = fmt(salary);
+  document.getElementById('stats-freelance').textContent = fmt(freelance);
+  document.getElementById('stats-passive').textContent = fmt(passive);
+
+  const months = ['T1','T2','T3','T4','T5','T6'];
+  const base = total > 0 ? total : 5000000;
+  const data = [0.6,0.7,0.75,0.85,0.92,1.0].map((r,i) => i===5 ? (total||Math.round(base*r)) : Math.round(base*r));
+  const maxVal = Math.max(...data) || 1;
+  document.getElementById('bar-chart').innerHTML = data.map((v,i) => `
+    <div class="bar-wrap">
+      <div class="bar-fill" style="height:${Math.max(8,Math.round(v/maxVal*70))}px;background:${i===5?'var(--blue)':'rgba(21,101,192,0.25)'}"></div>
+      <div class="bar-lbl">${months[i]}</div>
+    </div>`).join('');
+
+  const types = [{lbl:'Lương',val:salary,color:'var(--blue)'},{lbl:'Freelance',val:freelance,color:'var(--purple)'},{lbl:'Thụ động',val:passive,color:'var(--green)'}];
+  document.getElementById('stats-breakdown').innerHTML = types.map(t => {
+    const pct = total > 0 ? Math.round(t.val/total*100) : 0;
+    return `<div class="breakdown-row"><div class="breakdown-lbl">${t.lbl}</div><div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${pct}%;background:${t.color}"></div></div><div class="breakdown-pct">${pct}%</div></div>`;
+  }).join('');
+
+  let insight = 'Thêm nguồn thu để nhận phân tích AI.';
+  if (total > 0) {
+    const fp = total > 0 ? Math.round(freelance/total*100) : 0;
+    if (fp < 20) insight = `Thu nhập phụ thuộc ${100-fp}% vào lương cố định — rủi ro cao. Hãy bắt đầu xây thêm nguồn freelance.`;
+    else if (fp > 50) insight = `${fp}% từ freelance — rất tốt! Bước tiếp theo: chuyển một phần sang passive income để ổn định hơn.`;
+    else insight = `Bạn có ${streams.length} nguồn thu. Mục tiêu lý tưởng: 40% lương + 40% freelance + 20% thụ động.`;
+  }
+  document.getElementById('stats-insight-text').textContent = insight;
+
+  if (userProfile?.goal) {
+    const gm = {'5–12 triệu':12000000,'12–25 triệu':25000000,'25–50 triệu':50000000,'50 triệu+':80000000};
+    const target = gm[userProfile.goal] || 10000000;
+    const pct = Math.min(Math.round(total/target*100),100);
+    document.getElementById('stats-goal-row').innerHTML = `
+      <div class="goal-item">
+        <div class="goal-item-top"><div class="goal-item-name">Mục tiêu: ${userProfile.goal}/tháng</div><div class="goal-item-pct">${pct}%</div></div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;">${fmtF(total)} / ${fmtF(target)}</div>
+      </div>`;
+  }
+}
+
+// ══════════════════════════════════════
+//  BUDGET TOOL
+// ══════════════════════════════════════
+let budgetItems = JSON.parse(localStorage.getItem('moneyos_budget') || '[]');
+
+function openBudgetTool() {
+  const total = streams.reduce((s,x)=>s+x.amount,0);
+  document.getElementById('budget-income').textContent = total.toLocaleString('vi-VN') + 'đ';
+  renderBudget();
+  document.getElementById('budget-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeBudgetModal(e) {
+  if (e.target.id==='budget-modal') { document.getElementById('budget-modal').classList.remove('show'); document.body.style.overflow=''; }
+}
+function addBudgetItem() {
+  const name=document.getElementById('budget-cat-name').value.trim();
+  const amt=parseInt(document.getElementById('budget-cat-amt').value)||0;
+  if(!name||!amt){showToast('⚠️ Nhập tên và số tiền');return;}
+  budgetItems.push({name,amt});
+  localStorage.setItem('moneyos_budget',JSON.stringify(budgetItems));
+  document.getElementById('budget-cat-name').value='';
+  document.getElementById('budget-cat-amt').value='';
+  renderBudget();
+}
+function deleteBudgetItem(i) {
+  budgetItems.splice(i,1);
+  localStorage.setItem('moneyos_budget',JSON.stringify(budgetItems));
+  renderBudget();
+}
+function renderBudget() {
+  const total=streams.reduce((s,x)=>s+x.amount,0);
+  const expense=budgetItems.reduce((s,x)=>s+x.amt,0);
+  const remain=total-expense;
+  document.getElementById('budget-cats').innerHTML=budgetItems.map((b,i)=>`
+    <div class="budget-cat-item"><span class="budget-cat-name">${b.name}</span><span class="budget-cat-amt">-${b.amt.toLocaleString('vi-VN')}đ</span><button class="budget-cat-del" onclick="deleteBudgetItem(${i})" type="button">×</button></div>`).join('');
+  document.getElementById('budget-expense').textContent='-'+expense.toLocaleString('vi-VN')+'đ';
+  document.getElementById('budget-remain').textContent=remain.toLocaleString('vi-VN')+'đ';
+  document.getElementById('budget-remain').style.color=remain>=0?'var(--green)':'var(--red)';
+}
+
+// ══════════════════════════════════════
+//  GOALS TOOL
+// ══════════════════════════════════════
+let userGoals = JSON.parse(localStorage.getItem('moneyos_goals') || '[]');
+
+function openGoalsTool() {
+  renderGoals();
+  document.getElementById('goals-modal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeGoalsModal(e) {
+  if(e.target.id==='goals-modal'){document.getElementById('goals-modal').classList.remove('show');document.body.style.overflow='';}
+}
+function addGoal() {
+  const name=document.getElementById('goal-name').value.trim();
+  const target=parseInt(document.getElementById('goal-target').value)||0;
+  const saved=parseInt(document.getElementById('goal-saved').value)||0;
+  if(!name||!target){showToast('⚠️ Nhập tên và số tiền mục tiêu');return;}
+  userGoals.push({name,target,saved});
+  localStorage.setItem('moneyos_goals',JSON.stringify(userGoals));
+  document.getElementById('goal-name').value='';
+  document.getElementById('goal-target').value='';
+  document.getElementById('goal-saved').value='';
+  renderGoals();
+}
+function deleteGoal(i) {
+  userGoals.splice(i,1);
+  localStorage.setItem('moneyos_goals',JSON.stringify(userGoals));
+  renderGoals();
+}
+function renderGoals() {
+  const fmt=v=>v.toLocaleString('vi-VN')+'đ';
+  document.getElementById('goals-list').innerHTML=userGoals.length===0
+    ? '<div style="font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;margin-bottom:16px;">Chưa có mục tiêu nào.</div>'
+    : userGoals.map((g,i)=>{
+        const pct=Math.min(Math.round(g.saved/g.target*100),100);
+        return `<div class="goal-card"><div class="goal-card-top"><div class="goal-card-name">${g.name}</div><button class="goal-card-del" onclick="deleteGoal(${i})" type="button">×</button></div><div class="goal-bar-bg"><div class="goal-bar-fill" style="width:${pct}%"></div></div><div class="goal-card-nums"><span>${fmt(g.saved)} / ${fmt(g.target)}</span><span>${pct}%</span></div></div>`;
+      }).join('');
+}
+
+// ══════════════════════════════════════
+//  PSYCH CHECK
+// ══════════════════════════════════════
+const PSYCH_QS = [
+  {text:'Tôi đang cảm thấy mệt mỏi về thể chất?', danger:'yes'},
+  {text:'Tôi đang lo lắng hoặc căng thẳng?', danger:'yes'},
+  {text:'Tôi đang tập trung và sẵn sàng làm việc?', danger:'no'},
+  {text:'Tôi đang bị phân tâm bởi việc khác?', danger:'yes'},
+  {text:'Tôi có đủ năng lượng để hoàn thành công việc hôm nay?', danger:'no'},
+];
+let psychAnswers = {};
+
+function openPsychCheck() {
+  psychAnswers = {};
+  renderPsychQuestions();
+  document.getElementById('psych-result').style.display='none';
+  document.getElementById('psych-questions').style.display='';
+  document.getElementById('psych-progress').style.display='';
+  updatePsychProgress();
+  document.getElementById('psych-modal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closePsychModal(e) {
+  if(e.target.id==='psych-modal'){document.getElementById('psych-modal').classList.remove('show');document.body.style.overflow='';}
+}
+function renderPsychQuestions() {
+  document.getElementById('psych-questions').innerHTML=PSYCH_QS.map((q,i)=>`
+    <div class="psych-q" id="psych-q-${i}">
+      <div class="psych-q-text">${i+1}. ${q.text}</div>
+      <div class="psych-q-btns">
+        <button class="psych-btn yes" onclick="psychAnswer(${i},'yes',this)" type="button">CÓ</button>
+        <button class="psych-btn no"  onclick="psychAnswer(${i},'no',this)"  type="button">KHÔNG</button>
+      </div>
+    </div>`).join('');
+}
+function psychAnswer(idx,val,btn) {
+  psychAnswers[idx]=val;
+  document.getElementById(`psych-q-${idx}`).querySelectorAll('.psych-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePsychProgress();
+  if(Object.keys(psychAnswers).length===PSYCH_QS.length) setTimeout(()=>showPsychResult(),500);
+}
+function updatePsychProgress() {
+  const done=Object.keys(psychAnswers).length;
+  document.getElementById('psych-prog-fill').style.width=(done/PSYCH_QS.length*100)+'%';
+  document.getElementById('psych-prog-txt').textContent=`${done} / ${PSYCH_QS.length}`;
+}
+function showPsychResult() {
+  const danger=PSYCH_QS.filter((q,i)=>psychAnswers[i]===q.danger).length;
+  document.getElementById('psych-questions').style.display='none';
+  document.getElementById('psych-progress').style.display='none';
+  document.getElementById('psych-result').style.display='';
+  const r = danger===0
+    ? {icon:'✅',title:'Sẵn sàng!',color:'#00e5a0',sub:'Tâm lý ổn định. Thể chất sẵn sàng.\nBắt đầu công việc quan trọng ngay bây giờ.'}
+    : danger<=2
+    ? {icon:'⚠️',title:'Cần chú ý',color:'#ffb547',sub:`Có ${danger} yếu tố cần lưu ý. Bạn có thể làm việc nhưng hãy thận trọng hơn bình thường.`}
+    : {icon:'🚫',title:'Nghỉ ngơi trước',color:'#ff3d5a',sub:`Có ${danger} yếu tố rủi ro. Nghỉ ngơi 15–30 phút rồi kiểm tra lại.`};
+  document.getElementById('psych-result-icon').textContent=r.icon;
+  document.getElementById('psych-result-title').textContent=r.title;
+  document.getElementById('psych-result-title').style.color=r.color;
+  document.getElementById('psych-result-sub').textContent=r.sub;
+}
+function resetPsychCheck() {
+  psychAnswers={};
+  renderPsychQuestions();
+  document.getElementById('psych-result').style.display='none';
+  document.getElementById('psych-questions').style.display='';
+  document.getElementById('psych-progress').style.display='';
+  updatePsychProgress();
+}
 
 let toastTimer;
 function showToast(msg) {

@@ -3240,6 +3240,61 @@ Ai cần thì tham khảo nhé 👇</div>
   </div>
 </div>
 
+<!-- DEV DASHBOARD MODAL (nhấn logo 5 lần để mở) -->
+<div class="modal-overlay" id="dev-dashboard" onclick="closeDevDash(event)" style="z-index:600;">
+  <div class="modal" style="background:#0a0b0e;border-radius:24px 24px 0 0;max-height:90vh;overflow-y:auto;">
+    <div class="modal-handle" style="background:rgba(255,255,255,0.15)"></div>
+
+    <!-- Header -->
+    <div style="padding:0 20px 4px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(0,229,160,0.8);text-transform:uppercase;">⚡ Dev Dashboard</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="devToggleUnlock()" type="button" id="dev-lock-btn"
+          style="padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:rgba(176,184,208,0.8);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;touch-action:manipulation;">
+          🔓 Toggle Lock
+        </button>
+        <button onclick="closeDevDashBtn()" type="button"
+          style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.08);color:rgba(176,184,208,0.6);font-size:16px;cursor:pointer;">×</button>
+      </div>
+    </div>
+
+    <div style="padding:12px 20px 24px;" id="dev-dash-content">
+      <!-- Metrics row -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;" id="dev-metrics"></div>
+
+      <!-- Conversion funnel -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:rgba(0,229,160,0.7);margin-bottom:12px;">CONVERSION FUNNEL (thiết bị này)</div>
+        <div id="dev-funnel"></div>
+      </div>
+
+      <!-- Referrals -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:rgba(0,229,160,0.7);margin-bottom:12px;">REFERRAL CONVERSIONS</div>
+        <div id="dev-referrals"></div>
+      </div>
+
+      <!-- User profile -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:rgba(0,229,160,0.7);margin-bottom:12px;">USER PROFILE (thiết bị này)</div>
+        <div id="dev-profile"></div>
+      </div>
+
+      <!-- AI Optimization tips -->
+      <div style="background:linear-gradient(135deg,rgba(0,229,160,0.08),rgba(77,159,255,0.05));border:1px solid rgba(0,229,160,0.2);border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:rgba(0,229,160,0.8);margin-bottom:12px;">✦ GỢI Ý TỐI ƯU CONVERSION</div>
+        <div id="dev-tips"></div>
+      </div>
+
+      <!-- GA Link -->
+      <a href="https://analytics.google.com" target="_blank"
+        style="display:block;text-align:center;padding:12px;background:rgba(21,101,192,0.2);border:1px solid rgba(21,101,192,0.3);border-radius:10px;font-family:'DM Mono',monospace;font-size:11px;color:rgba(77,159,255,0.8);text-decoration:none;">
+        📊 Mở Google Analytics →
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM RESET MODAL -->
 <div class="confirm-overlay" id="confirm-reset" onclick="closeConfirmReset(event)">
   <div class="confirm-sheet">
@@ -4318,27 +4373,118 @@ async function devUnlockTap() {
 
   if (_devTaps >= 5) {
     _devTaps = 0;
-    if (isUnlocked) {
-      isUnlocked = false;
-      localStorage.removeItem('moneyos_unlocked');
-      clearState();
-      showToast('🔒 Dev: Locked');
-      applyCoachLockState();
-      if (userProfile) { renderOpportunities(getFallbackOpps()); }
-    } else {
-      isUnlocked = true;
-      localStorage.setItem('moneyos_unlocked', 'true');
-      saveState();
-      showToast('🔓 Dev: Unlocked');
-      applyCoachLockState();
-      hideChatLimitWall();
-      if (userProfile) { renderOpportunities(getFallbackOpps()); }
-      setTimeout(() => {
-        document.getElementById('intake-overlay').classList.add('show');
-        document.body.style.overflow = 'hidden';
-      }, 400);
-    }
+    openDevDashboard();
   }
+}
+
+function openDevDashboard() {
+  renderDevDashboard();
+  document.getElementById('dev-dashboard').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDevDash(e) {
+  if (e.target.id === 'dev-dashboard') closeDevDashBtn();
+}
+
+function closeDevDashBtn() {
+  document.getElementById('dev-dashboard').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function devToggleUnlock() {
+  if (isUnlocked) {
+    isUnlocked = false;
+    localStorage.removeItem('moneyos_unlocked');
+    clearState();
+    showToast('🔒 Dev: Locked');
+    applyCoachLockState();
+    if (userProfile) { renderOpportunities(getFallbackOpps()); }
+  } else {
+    isUnlocked = true;
+    localStorage.setItem('moneyos_unlocked', 'true');
+    saveState();
+    showToast('🔓 Dev: Unlocked');
+    applyCoachLockState();
+    hideChatLimitWall();
+    if (userProfile) { renderOpportunities(getFallbackOpps()); }
+  }
+  document.getElementById('dev-lock-btn').textContent = isUnlocked ? '🔒 Lock' : '🔓 Unlock';
+  renderDevDashboard();
+}
+
+function renderDevDashboard() {
+  // ── Collect local data ──
+  const conversions = JSON.parse(localStorage.getItem('moneyos_ref_conversions') || '[]');
+  const usedCodes   = JSON.parse(localStorage.getItem('moneyos_used_codes') || '[]');
+  const state       = JSON.parse(localStorage.getItem('moneyos_state_v2') || 'null');
+
+  // Metrics
+  const metricsData = [
+    { label:'Profile', val: userProfile ? '✅' : '❌', sub: userProfile?.name || 'Chưa có' },
+    { label:'Unlock', val: isUnlocked ? '✅' : '❌', sub: isUnlocked ? 'Pro' : 'Free' },
+    { label:'Mã đã dùng', val: usedCodes.length, sub: '/ 50 mã' },
+    { label:'Ref conversions', val: conversions.length, sub: 'lần' },
+    { label:'Ref link', val: userProfile ? '✅' : '—', sub: getCurrentRef() || 'direct' },
+    { label:'Streams', val: streams.length, sub: 'nguồn thu' },
+  ];
+
+  document.getElementById('dev-metrics').innerHTML = metricsData.map(m => `
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#f0f2f7;">${m.val}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(176,184,208,0.5);margin-top:2px;">${m.label}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(0,229,160,0.6);">${m.sub}</div>
+    </div>`).join('');
+
+  // Funnel
+  const funnelSteps = [
+    { name:'App load', done: true },
+    { name:'Onboarding', done: !!userProfile },
+    { name:'Coach page', done: !!userProfile },
+    { name:'Paywall shown', done: paywallShown },
+    { name:'Unlock / Paid', done: isUnlocked },
+  ];
+  document.getElementById('dev-funnel').innerHTML = funnelSteps.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="width:20px;height:20px;border-radius:50%;background:${s.done?'rgba(0,229,160,0.2)':'rgba(255,255,255,0.06)'};border:1px solid ${s.done?'rgba(0,229,160,0.5)':'rgba(255,255,255,0.1)'};display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">
+        ${s.done?'✓':i+1}
+      </div>
+      <div style="flex:1;height:4px;background:${s.done?'rgba(0,229,160,0.3)':'rgba(255,255,255,0.06)'};border-radius:2px;"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:${s.done?'rgba(0,229,160,0.8)':'rgba(176,184,208,0.4)'};width:110px;">${s.name}</div>
+    </div>`).join('');
+
+  // Referrals
+  document.getElementById('dev-referrals').innerHTML = conversions.length === 0
+    ? '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:rgba(176,184,208,0.4);">Chưa có referral conversion nào.</div>'
+    : conversions.map(c => `
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(0,229,160,0.8);">${c.ref}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(176,184,208,0.6);">${c.user} · ${new Date(c.time).toLocaleDateString('vi-VN')}</div>
+      </div>`).join('');
+
+  // Profile
+  document.getElementById('dev-profile').innerHTML = userProfile
+    ? Object.entries(userProfile).map(([k,v]) => `
+      <div style="display:flex;gap:8px;padding:4px 0;">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(77,159,255,0.7);width:70px;flex-shrink:0;">${k}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(240,242,247,0.8);">${Array.isArray(v)?v.join(', '):v}</span>
+      </div>`).join('')
+    : '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:rgba(176,184,208,0.4);">Chưa có profile.</div>';
+
+  // AI Optimization Tips
+  const tips = [];
+  if (!userProfile) tips.push({ icon:'🎯', text:'Onboarding chưa hoàn thành — user chưa thấy được value của app. Kiểm tra flow onboarding có bị lỗi không.' });
+  if (userProfile && !isUnlocked) tips.push({ icon:'💰', text:'User đã có profile nhưng chưa unlock. Xem lại paywall copy — thêm urgency hoặc giảm friction ở bước nhập mã.' });
+  if (usedCodes.length > 40) tips.push({ icon:'⚠️', text:`Đã dùng ${usedCodes.length}/50 mã. Cần tạo thêm mã mới sớm.` });
+  if (conversions.length === 0 && isUnlocked) tips.push({ icon:'📢', text:'Chưa có referral. Nhắc user share link trong chat sau khi unlock — hiện đã có bubble tự động.' });
+  if (streams.length === 0) tips.push({ icon:'📊', text:'User chưa thêm thu nhập — trang Home trông trống. Thêm prompt nhắc nhở thêm nguồn thu.' });
+  if (tips.length === 0) tips.push({ icon:'✅', text:'Mọi thứ đang tốt! Tập trung vào kéo traffic.' });
+
+  document.getElementById('dev-tips').innerHTML = tips.map(t => `
+    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+      <span style="font-size:16px;flex-shrink:0;">${t.icon}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(176,184,208,0.8);line-height:1.6;">${t.text}</span>
+    </div>`).join('');
 }
 
 // ══════════════════════════════════════

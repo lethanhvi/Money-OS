@@ -4233,6 +4233,12 @@ async function hashCode(code) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+// Blacklist — thêm hash của mã muốn vô hiệu hóa vào đây → push GitHub
+// Ví dụ: user gian lận hoặc hoàn tiền → thêm hash của mã họ đã dùng
+const BLACKLISTED_HASHES = new Set([
+  // '19ca7d67e5286926...' // ← paste hash của mã cần block vào đây
+]);
+
 async function verifyActivationCode() {
   const input = document.getElementById('activation-code-input');
   const code = input?.value?.trim().toUpperCase();
@@ -4246,6 +4252,12 @@ async function verifyActivationCode() {
   // Check already used
   const usedCodes = JSON.parse(localStorage.getItem('moneyos_used_codes') || '[]');
   const hash = await hashCode(code);
+
+  // Check blacklist — mã bị vô hiệu hóa
+  if (BLACKLISTED_HASHES.has(hash)) {
+    if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã này đã bị vô hiệu hóa. Nhắn Zalo 0921 634 984 để được hỗ trợ.'; }
+    return;
+  }
 
   if (usedCodes.includes(hash)) {
     if (errEl) { errEl.style.display = ''; errEl.textContent = '❌ Mã này đã được sử dụng trên thiết bị khác.'; }

@@ -2681,10 +2681,10 @@ svg.spark { width:100%; height:54px; }
     </div>
 
     <div class="quick-prompts" id="chat-quick-prompts">
-      <div class="qp-btn" onclick="quickAsk(this)">Tôi nên bắt đầu từ đâu?</div>
-      <div class="qp-btn" onclick="quickAsk(this)">Kỹ năng nào hot nhất?</div>
-      <div class="qp-btn" onclick="quickAsk(this)">Ước tính thu nhập thực tế</div>
-      <div class="qp-btn" onclick="quickAsk(this)">Rủi ro cần tránh?</div>
+      <div class="qp-btn" onclick="quickAsk(this)" id="qp-1">Tôi nên bắt đầu từ đâu?</div>
+      <div class="qp-btn" onclick="quickAsk(this)" id="qp-2">Kiếm bao nhiêu thực tế?</div>
+      <div class="qp-btn" onclick="quickAsk(this)" id="qp-3">Tìm khách đầu tiên?</div>
+      <div class="qp-btn" onclick="quickAsk(this)" id="qp-4">Sai lầm cần tránh?</div>
     </div>
     <div class="chat-input-row" id="chat-input-row">
       <textarea class="chat-input" id="chat-input" rows="1" placeholder="Hỏi về cơ hội kiếm tiền..." onkeydown="handleChatKey(event)"></textarea>
@@ -5111,12 +5111,12 @@ Tôi đã chuẩn bị sẵn plan cho bạn:
 // ── CHAT FUNCTIONS ────────────────────────────────────────
 
 function initChat() {
-  const p     = userProfile;
+  const p       = userProfile;
   const profile = getAIProfile();
-  const opps  = profile.opportunities;
-  const skill = p?.skills?.[0] || 'kỹ năng của bạn';
-  const job   = p?.job || 'công việc hiện tại';
-  const name  = p?.name || 'bạn';
+  const opps    = profile.opportunities;
+  const skill   = p?.skills?.[0] || 'kỹ năng của bạn';
+  const job     = p?.job || 'công việc hiện tại';
+  const firstName = p?.name?.split(' ').pop() || 'bạn';
 
   const incomeMap = {
     'Viết lách':'2–4 triệu', 'Thiết kế':'3–6 triệu', 'Lập trình':'5–12 triệu',
@@ -5124,35 +5124,67 @@ function initChat() {
     'Tài chính':'3–7 triệu', 'Ngoại ngữ':'2–4 triệu', 'Mạng xã hội':'2–4 triệu',
     'Excel / Data':'3–6 triệu'
   };
-  const earn   = incomeMap[skill] || p?.goal || '1–3 triệu';
+  const earn    = incomeMap[skill] || p?.goal || '1–3 triệu';
   const bestOpp = opps[0];
   const otherOpps = opps.slice(1, 3);
 
+  // Greeting cá nhân hóa — cảm giác AI thật sự đã đọc hồ sơ
+  const greetings = [
+    `${firstName} — tôi vừa xem xong hồ sơ của bạn.\n\nNói thẳng: với **${skill}** + **${p?.time}/tuần** rảnh, bạn đang để **${earn}/tháng** trên bàn mà không biết.`,
+    `${firstName}, tôi đã phân tích profile của bạn rồi.\n\nSự thật là: người làm **${job}** có **${skill}** như bạn — đang kiếm thêm **${earn}/tháng** ngay lúc này. Không phải vì họ giỏi hơn.`,
+    `Xem xong hồ sơ của ${firstName} rồi.\n\nBạn có điều mà 80% người muốn kiếm thêm không có: **${skill}** + thời gian. Chỉ thiếu đúng 1 thứ — biết bắt đầu từ đâu.`
+  ];
+  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+
+  // Opening questions để tạo loop — tuỳ theo skill
+  const openingQMap = {
+    'Lập trình': `\n\n${firstName} đã từng thử freelance chưa, hay chưa biết bắt đầu từ đâu?`,
+    'Thiết kế': `\n\n${firstName} đang có portfolio chưa, hay cần tôi giúp xây từ đầu?`,
+    'Viết lách': `\n\n${firstName} đã viết cho ai chưa — dù chỉ là blog cá nhân hay content Zalo?`,
+    'Dạy học': `\n\n${firstName} đang dạy môn gì, hay đang muốn dạy gì nhất?`,
+    'Bán hàng': `\n\n${firstName} đã từng bán online chưa — dù chỉ 1 lần?`,
+  };
+  const openingQ = openingQMap[skill] || `\n\n${firstName} muốn bắt đầu từ đâu — tìm client đầu tiên hay xây profile trước?`;
+
   const msg = [
-    // 1. HOOK
-    `⚠️ ${name} đang bỏ lỡ ~**${earn}/tháng**\n(≈ ${calcDaily(earn)} mỗi ngày)`,
-
-    // 2. INSIGHT
-    `Bạn đã có kỹ năng để kiếm tiền rồi.\nNhưng hiện tại bạn chưa biết cách biến nó thành thu nhập.\n\nHầu hết người làm **${job}** như bạn đều đang ở tình trạng này.`,
-
-    // 3. BEST OPPORTUNITY
-    `🔥 Cách phù hợp nhất với bạn:\n\n**${bestOpp.title}**\n→ +${bestOpp.earn}`,
-
-    // 4. LÝ DO
-    `Phù hợp với bạn vì:\n\n✓ Bạn đã có skill **${skill}**\n✓ Không cần vốn\n✓ Có thể bắt đầu ngay trong 24h`,
-
-    // 5. TRANSITION
-    `Đừng nghĩ tới ${earn} ngay.\n\nBắt đầu đơn giản:\n→ Kiếm **200k đầu tiên** trước\n\n(Xem phần bên dưới 👇)`,
-
-    // 6. OTHER OPTIONS
+    greeting,
+    `🔥 Cách nhanh nhất cho bạn:\n\n**${bestOpp.title}**\n→ +${bestOpp.earn}\n✓ Có skill rồi · Không cần vốn · Bắt đầu trong 24h`,
+    `Đừng nghĩ tới ${earn} ngay — bắt đầu với **200k đầu tiên** thôi.\n\n(Xem template bên dưới 👇)` + openingQ,
     otherOpps.length > 0
-      ? `Các cách khác bạn có thể thử sau:\n\n${otherOpps.map(o => `• ${o.title} → +${o.earn}`).join('\n')}`
+      ? `Sau khi có client đầu tiên, có thể thêm:\n${otherOpps.map(o => `• ${o.title} → +${o.earn}`).join('\n')}`
       : null
-
   ].filter(Boolean).join('\n\n---\n\n');
 
   appendMsg('ai', msg);
   freeReplyCount = 0;
+  personalizeQuickPrompts();
+}
+
+function personalizeQuickPrompts() {
+  if (!userProfile) return;
+  const skill = userProfile.skills?.[0] || '';
+  const firstName = userProfile.name?.split(' ').pop() || 'bạn';
+
+  const promptMap = {
+    'Lập trình':      ['Rate bao nhiêu là hợp lý?', 'Upwork hay Fiverr tốt hơn?', 'Tìm job đầu tiên ở đâu?', 'Proposal viết như thế nào?'],
+    'Thiết kế':       ['Portfolio cần gì để win?', 'Rate logo bao nhiêu?', 'Fiverr hay Facebook?', 'Tìm client SME thế nào?'],
+    'Viết lách':      ['Content nào trả cao nhất?', 'Tìm khách viết bài ở đâu?', 'Rate 1 bài viết bao nhiêu?', 'Xây portfolio thế nào?'],
+    'Dạy học':        ['Dạy môn gì ra tiền nhất?', 'Zoom hay Zalo tốt hơn?', 'Đăng bài tìm học viên thế nào?', 'Giá 1 buổi bao nhiêu?'],
+    'Chụp ảnh/Video': ['Niche nào trả cao nhất?', 'Tìm client event ở đâu?', 'Rate 1 buổi chụp bao nhiêu?', 'Portfolio cần gì?'],
+    'Mạng xã hội':    ['Quản lý page giá bao nhiêu?', 'Tìm SME cần quản lý page?', 'Cần skill gì để bắt đầu?', 'Có thể làm mấy page cùng lúc?'],
+  };
+
+  const prompts = promptMap[skill] || [
+    `${firstName} nên bắt đầu từ đâu?`,
+    'Kiếm bao nhiêu là thực tế?',
+    'Tìm khách đầu tiên thế nào?',
+    'Sai lầm phổ biến nhất là gì?'
+  ];
+
+  ['qp-1','qp-2','qp-3','qp-4'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && prompts[i]) el.textContent = prompts[i];
+  });
 }
 
 function calcDaily(earnStr) {
@@ -5258,15 +5290,36 @@ async function sendMessage() {
   btn.disabled = true;
   showTyping();
 
-  const sys = `Bạn là Income Coach của MoneyOS — chuyên giúp người Việt kiếm thêm thu nhập.
-Hồ sơ user: Tên: ${userProfile.name}, Nghề: ${userProfile.job}, Kỹ năng: ${userProfile.skills.join(', ')}, Thời gian rảnh: ${userProfile.time}/tuần, Mục tiêu: ${userProfile.goal}/tháng.
+  const turnCount = chatHistory.filter(m => m.role === 'user').length;
+  const contextSummary = chatHistory.length > 2
+    ? chatHistory.slice(-4).map(m => `${m.role === 'user' ? 'User' : 'Coach'}: ${m.content.slice(0,80)}`).join('\n')
+    : '';
 
-Quy tắc trả lời:
-- Trả lời ĐÚNG câu hỏi user hỏi, không lạc đề
-- Nếu user hỏi định nghĩa (X là gì) → giải thích rõ ràng bằng tiếng Việt đơn giản, có ví dụ thực tế
-- Nếu user hỏi cách làm → đưa bước cụ thể, có thể làm ngay trong 30 phút
-- Ngắn gọn 3–5 câu. Số tiền VNĐ cụ thể. Không nói vòng vo.
-- Luôn kết bằng 1 hành động cụ thể user có thể làm ngay hôm nay.`;
+  const sys = `Bạn là một mentor tài chính cá nhân — thẳng thắn, thực tế, quan tâm thật sự đến user.
+
+THÔNG TIN USER (đã xác nhận):
+- Tên: ${userProfile.name}
+- Nghề: ${userProfile.job}
+- Kỹ năng: ${userProfile.skills.join(', ')}
+- Thời gian rảnh: ${userProfile.time}/tuần
+- Mục tiêu: ${userProfile.goal}/tháng
+
+NGUYÊN TẮC GIAO TIẾP:
+1. Gọi tên user (${userProfile.name.split(' ').pop()}) ít nhất 1 lần trong reply đầu tiên
+2. Nhắc lại context từ hội thoại trước nếu có — tạo cảm giác được nhớ
+3. Trả lời ĐÚNG câu hỏi, không lạc đề
+4. Ngắn gọn 3–4 câu. Số tiền VNĐ cụ thể. Không sáo rỗng.
+5. Cuối reply LUÔN có 1 câu hỏi ngắn để tiếp tục hội thoại
+6. Giọng điệu: như người bạn thành công đang cho lời khuyên thật — không phải chatbot
+
+VÍ DỤ GIỌNG TỐT:
+"${userProfile.name.split(' ').pop()}, với ${userProfile.skills[0]} bạn đang để tiền trên bàn. Bước đơn giản nhất là X. Bạn đã thử Y chưa?"
+
+VÍ DỤ GIỌNG XẤU:
+"Dựa trên phân tích của tôi, tôi đề xuất bạn nên cân nhắc..."
+
+${contextSummary ? `CONTEXT HỘI THOẠI GẦN NHẤT:\n${contextSummary}` : ''}
+Turn thứ: ${turnCount + 1}`;
 
   try {
     const data = await callAI({
